@@ -1,5 +1,7 @@
 import type { Account } from 'tronweb';
 
+import { AccountMessages, DefaultErrorMessages, Network } from '@/config';
+import { ApplicationError } from '@/errors';
 import type { TronWebService } from '@/services';
 
 export class CreateAccountUseCase {
@@ -23,25 +25,25 @@ export class CreateAccountUseCase {
     let newTrxAccount: Account | null;
 
     switch (network) {
-      case 'mainnet':
+      case Network.MAINNET:
         newTrxAccount = await this.tronWebService.mainnet.createAccount();
         break;
-      case 'testnet':
+      case Network.TESTNET:
         newTrxAccount = await this.tronWebService.testnet.createAccount();
         break;
       default:
-        throw new Error('Invalid network provided');
+        throw new ApplicationError(DefaultErrorMessages.UNCAUGHT_EXCEPTION);
     }
 
     if (!newTrxAccount?.privateKey)
-      throw new Error('Something went wrong while generating a new account');
+      throw new ApplicationError(AccountMessages.CREATION_EXCEPTION);
 
     const res: CreateAccountUseCase.Result = {
       account: {
-        network,
-        ...newTrxAccount
+        ...newTrxAccount,
+        network
       },
-      message: 'Account created successfully'
+      message: AccountMessages.CREATED
     };
 
     return res;

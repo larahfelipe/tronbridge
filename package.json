@@ -21,7 +21,8 @@
     "fastify": "^4.17.0",
     "tronweb": "^5.1.0",
     "tsconfig-paths": "^4.2.0",
-    "tscpaths": "^0.0.9"
+    "tscpaths": "^0.0.9",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@types/node": "^20.1.0",

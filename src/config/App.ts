@@ -32,7 +32,9 @@ export class App {
         throw err;
       }
 
-      this.app.log.info('Bootstrap completed successfully');
+      this.app.log.info(
+        `Bootstrap completed successfully and is now listening on ${address}`
+      );
       console.log(`\n> Listening at ${address}\n`);
     });
   }

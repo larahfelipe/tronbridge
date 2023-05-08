@@ -1,7 +1,9 @@
-import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 
+import type { ApplicationError } from '@/errors';
 import type { Controller } from '@/interfaces';
 import type { CreateAccountUseCase } from '@/use-cases/account';
+import { CreateAccountSchema, validate } from '@/validation';
 
 export class CreateAccountController implements Controller {
   private static INSTANCE: CreateAccountController;
@@ -25,22 +27,22 @@ export class CreateAccountController implements Controller {
     res: CreateAccountController.Response
   ) {
     try {
-      const { network } = req.query as { network: string };
-
-      if (!network?.length) throw new Error('Parameter network is required');
+      const { network } = await validate(CreateAccountSchema, req.query);
 
       const result = await this.createAccountUseCase.execute({ network });
 
       return res.status(201).send(result);
     } catch (e) {
-      const { message } = e as FastifyError;
+      const { statusCode, name, message } = e as ApplicationError;
 
-      return res.status(500).send(message);
+      return res.status(statusCode).send({ name, message });
     }
   }
 }
 
 namespace CreateAccountController {
-  export type Request = FastifyRequest;
+  export type Request = FastifyRequest<{
+    Querystring: Record<'network', string>;
+  }>;
   export type Response = FastifyReply;
 }
