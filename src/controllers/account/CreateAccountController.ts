@@ -1,9 +1,9 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
+import { DefaultErrorMessages } from '@/config';
 import type { ApplicationError } from '@/errors';
 import type { Controller } from '@/interfaces';
 import type { CreateAccountUseCase } from '@/use-cases/account';
-import { CreateAccountSchema, validate } from '@/validation';
 
 export class CreateAccountController implements Controller {
   private static INSTANCE: CreateAccountController;
@@ -14,7 +14,11 @@ export class CreateAccountController implements Controller {
   }
 
   static getInstance(createAccountUseCase: CreateAccountUseCase) {
-    if (!CreateAccountController.INSTANCE)
+    if (
+      !CreateAccountController.INSTANCE ||
+      CreateAccountController.INSTANCE.createAccountUseCase !==
+        createAccountUseCase
+    )
       CreateAccountController.INSTANCE = new CreateAccountController(
         createAccountUseCase
       );
@@ -23,17 +27,19 @@ export class CreateAccountController implements Controller {
   }
 
   async handle(
-    req: CreateAccountController.Request,
+    _: CreateAccountController.Request,
     res: CreateAccountController.Response
   ) {
     try {
-      const { network } = await validate(CreateAccountSchema, req.query);
-
-      const result = await this.createAccountUseCase.execute({ network });
+      const result = await this.createAccountUseCase.create();
 
       return res.status(201).send(result);
     } catch (e) {
-      const { statusCode, name, message } = e as ApplicationError;
+      const {
+        statusCode = 500,
+        name = 'InternalServerError',
+        message = DefaultErrorMessages.INTERNAL_SERVER_ERROR
+      } = e as ApplicationError;
 
       return res.status(statusCode).send({ name, message });
     }
@@ -41,8 +47,6 @@ export class CreateAccountController implements Controller {
 }
 
 namespace CreateAccountController {
-  export type Request = FastifyRequest<{
-    Querystring: Record<'network', string>;
-  }>;
+  export type Request = FastifyRequest;
   export type Response = FastifyReply;
 }

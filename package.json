@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^8.2.1",
+    "axios": "^1.4.0",
     "dotenv": "^16.0.3",
     "fastify": "^4.17.0",
     "tronweb": "^5.1.0",

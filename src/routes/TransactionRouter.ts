@@ -1,17 +1,14 @@
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 
 import { Networks } from '@/config';
-import {
-  createAccountControllerHandler,
-  getAccountControllerHandler
-} from '@/controllers/account';
+import { createTransactionControllerHandler } from '@/controllers/transaction';
 import type { Router } from '@/interfaces';
 
-export class AccountRouter implements Router {
+export class TransactionRouter implements Router {
   endpointUri: string;
 
   constructor() {
-    this.endpointUri = '/v1/account';
+    this.endpointUri = '/v1/transaction';
   }
 
   async routes(
@@ -20,8 +17,7 @@ export class AccountRouter implements Router {
     done: () => unknown
   ) {
     Object.values(Networks).forEach((network) => {
-      fastify.get(`/${network}`, getAccountControllerHandler);
-      fastify.post(`/${network}`, createAccountControllerHandler);
+      fastify.post(`/${network}`, createTransactionControllerHandler);
     });
 
     done();

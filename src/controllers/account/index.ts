@@ -1,15 +1,22 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
-import { TronWebService } from '@/services';
-import { CreateAccountUseCase } from '@/use-cases/account';
+import { Networks } from '@/config';
+import { TronGridService, TronWebService } from '@/services';
+import { CreateAccountUseCase, GetAccountUseCase } from '@/use-cases/account';
+import type { GetAccountSchemaType } from '@/validation/schema';
 
 import { CreateAccountController } from './CreateAccountController';
+import { GetAccountController } from './GetAccountController';
 
 export const createAccountControllerHandler = (
   req: FastifyRequest,
   res: FastifyReply
 ) => {
-  const tronWebService = TronWebService.getInstance();
+  const targetNetwork = req.routerPath.endsWith(Networks.MAINNET)
+    ? Networks.MAINNET
+    : Networks.TESTNET;
+
+  const tronWebService = TronWebService.getInstance(targetNetwork);
 
   const createAccountUseCase = CreateAccountUseCase.getInstance(tronWebService);
 
@@ -17,4 +24,22 @@ export const createAccountControllerHandler = (
     CreateAccountController.getInstance(createAccountUseCase);
 
   return createAccountController.handle(req, res);
+};
+
+export const getAccountControllerHandler = (
+  req: FastifyRequest<{ Querystring: GetAccountSchemaType }>,
+  res: FastifyReply
+) => {
+  const targetNetwork = req.routerPath.endsWith(Networks.MAINNET)
+    ? Networks.MAINNET
+    : Networks.TESTNET;
+
+  const tronGridService = TronGridService.getInstance(targetNetwork);
+
+  const getAccountUseCase = GetAccountUseCase.getInstance(tronGridService);
+
+  const getAccountController =
+    GetAccountController.getInstance(getAccountUseCase);
+
+  return getAccountController.handle(req, res);
 };

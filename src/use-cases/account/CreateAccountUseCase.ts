@@ -1,6 +1,6 @@
-import type { Account } from 'tronweb';
+import type { GeneratedAccount } from 'tronweb';
 
-import { AccountMessages, DefaultErrorMessages, Network } from '@/config';
+import { AccountMessages } from '@/config';
 import { ApplicationError } from '@/errors';
 import type { TronWebService } from '@/services';
 
@@ -13,36 +13,23 @@ export class CreateAccountUseCase {
   }
 
   static getInstance(tronWebService: TronWebService) {
-    if (!CreateAccountUseCase.INSTANCE)
+    if (
+      !CreateAccountUseCase.INSTANCE ||
+      CreateAccountUseCase.INSTANCE.tronWebService !== tronWebService
+    )
       CreateAccountUseCase.INSTANCE = new CreateAccountUseCase(tronWebService);
 
     return CreateAccountUseCase.INSTANCE;
   }
 
-  async execute(params: CreateAccountUseCase.Params) {
-    const { network } = params;
+  async create() {
+    const newAccount = await this.tronWebService.createAccount();
 
-    let newTrxAccount: Account | null;
-
-    switch (network) {
-      case Network.MAINNET:
-        newTrxAccount = await this.tronWebService.mainnet.createAccount();
-        break;
-      case Network.TESTNET:
-        newTrxAccount = await this.tronWebService.testnet.createAccount();
-        break;
-      default:
-        throw new ApplicationError(DefaultErrorMessages.UNCAUGHT_EXCEPTION);
-    }
-
-    if (!newTrxAccount?.privateKey)
+    if (!newAccount?.privateKey)
       throw new ApplicationError(AccountMessages.CREATION_EXCEPTION);
 
     const res: CreateAccountUseCase.Result = {
-      account: {
-        ...newTrxAccount,
-        network
-      },
+      account: newAccount,
       message: AccountMessages.CREATED
     };
 
@@ -51,9 +38,8 @@ export class CreateAccountUseCase {
 }
 
 namespace CreateAccountUseCase {
-  export type Params = Record<'network', string>;
   export type Result = {
-    account: Account & Record<'network', string>;
+    account: GeneratedAccount;
     message: string;
   };
 }
