@@ -1,10 +1,10 @@
-import { TransactionMessages } from '@/config';
+import { ContractTypes, TransactionMessages } from '@/config';
 import type { Transaction } from '@/domain/models';
 import { ApplicationError } from '@/errors';
 import type { TronWebService } from '@/services';
 
-export class CreateTransactionUseCase {
-  private static INSTANCE: CreateTransactionUseCase;
+export class CreateStakingTransactionUseCase {
+  private static INSTANCE: CreateStakingTransactionUseCase;
   private readonly tronWebService: TronWebService;
 
   private constructor(tronWebService: TronWebService) {
@@ -13,19 +13,25 @@ export class CreateTransactionUseCase {
 
   static getInstance(tronWebService: TronWebService) {
     if (
-      !CreateTransactionUseCase.INSTANCE ||
-      CreateTransactionUseCase.INSTANCE.tronWebService !== tronWebService
+      !CreateStakingTransactionUseCase.INSTANCE ||
+      CreateStakingTransactionUseCase.INSTANCE.tronWebService !== tronWebService
     )
-      CreateTransactionUseCase.INSTANCE = new CreateTransactionUseCase(
-        tronWebService
-      );
+      CreateStakingTransactionUseCase.INSTANCE =
+        new CreateStakingTransactionUseCase(tronWebService);
 
-    return CreateTransactionUseCase.INSTANCE;
+    return CreateStakingTransactionUseCase.INSTANCE;
   }
 
-  async create(params: CreateTransactionUseCase.Params) {
+  async create(params: CreateStakingTransactionUseCase.Params) {
     const unsignedTransactionPayload =
-      await this.tronWebService.buildTransactionRecord(params);
+      await this.tronWebService.buildTransactionRecord({
+        ...params,
+        contractType: ContractTypes.FREEZE,
+        address: {
+          origin: params.address,
+          recipient: ''
+        }
+      });
 
     if (!unsignedTransactionPayload)
       throw new ApplicationError(TransactionMessages.BUILD_EXCEPTION);
@@ -58,14 +64,7 @@ export class CreateTransactionUseCase {
           hex: newTransaction.transaction.raw_data.contract[0].parameter.value
             .owner_address
         },
-        recipient: {
-          base58: this.tronWebService.hexToBase58(
-            newTransaction.transaction.raw_data.contract[0].parameter.value
-              .to_address
-          ),
-          hex: newTransaction.transaction.raw_data.contract[0].parameter.value
-            .to_address
-        }
+        recipient: null
       },
       amount:
         newTransaction.transaction.raw_data.contract[0].parameter.value.amount,
@@ -78,7 +77,7 @@ export class CreateTransactionUseCase {
       expiresAt: newTransaction.transaction.raw_data.expiration
     };
 
-    const res: CreateTransactionUseCase.Result = {
+    const res: CreateStakingTransactionUseCase.Result = {
       transaction,
       message: TransactionMessages.CREATED
     };
@@ -87,12 +86,12 @@ export class CreateTransactionUseCase {
   }
 }
 
-namespace CreateTransactionUseCase {
+namespace CreateStakingTransactionUseCase {
   export type Params = {
-    address: Record<'origin' | 'recipient', string>;
-    signingKey: string;
+    resourceType: string;
+    address: string;
     amount: number;
-    tokenID?: string;
+    signingKey: string;
   };
   export type Result = {
     transaction: Transaction;

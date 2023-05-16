@@ -4,11 +4,11 @@ export type Transaction = {
   isBroadcasted: boolean;
   address: {
     origin: Record<'base58' | 'hex', string>;
-    recipient: Record<'base58' | 'hex', string>;
+    recipient: Record<'base58' | 'hex', string> | null;
   };
   amount: number;
   block: Record<'bytes' | 'hash', string>;
   signature: Array<string>;
-  createdAt: string;
-  expiresAt: string;
+  createdAt: number;
+  expiresAt: number;
 };

@@ -1,6 +1,11 @@
-import TronWeb, { type SignedTransaction, type Transaction } from 'tronweb';
+import TronWeb, { type Transaction, type UnsignedTransaction } from 'tronweb';
 
-import { DefaultErrorMessages, Networks } from '@/config';
+import {
+  ContractTypes,
+  DefaultErrorMessages,
+  Networks,
+  type ResourceTypes
+} from '@/config';
 import { ApplicationError } from '@/errors';
 
 export class TronWebService {
@@ -33,13 +38,21 @@ export class TronWebService {
     return TronWebService.INSTANCE;
   }
 
-  async createAccount() {
-    const account = await this.tronWebInstance.createAccount();
+  async getAccountResources(address: string) {
+    const resources = await this.tronWebInstance.trx.getAccountResources(
+      address
+    );
 
-    return account;
+    return resources;
   }
 
-  async formatAmount(rawAmount: number, customDecimals?: number) {
+  async getAccountBandwidth(address: string) {
+    const bandwidth = await this.tronWebInstance.trx.getBandwidth(address);
+
+    return bandwidth;
+  }
+
+  formatAmount(rawAmount: number, customDecimals?: number) {
     if (rawAmount <= 0)
       throw new ApplicationError('Formatting an invalid amount');
 
@@ -48,45 +61,88 @@ export class TronWebService {
     if (customDecimals && customDecimals > 0) {
       amount = rawAmount * 10 ** customDecimals;
     } else {
-      amount = await this.tronWebInstance.toSun(rawAmount);
+      amount = this.tronWebInstance.toSun(rawAmount);
     }
 
     return amount;
   }
 
+  hexToBase58(hexValue: string) {
+    const base58Value = this.tronWebInstance.address.fromHex(hexValue);
+
+    return base58Value;
+  }
+
+  async createAccount() {
+    const account = await this.tronWebInstance.createAccount();
+
+    return account;
+  }
+
+  async getTransactionById(txId: TronWebService.GetTransactionByIdParams) {
+    const transaction = await this.tronWebInstance.trx.getTransaction(txId);
+
+    return transaction;
+  }
+
   async buildTransactionRecord({
-    token,
+    contractType = ContractTypes.TRANSFER,
+    amount,
     address,
-    amount
+    token,
+    resource
   }: TronWebService.BuildTransactionRecordParams) {
-    const formattedAmount = await this.formatAmount(
-      amount,
-      token?.id && token?.decimals ? token.decimals : 0
-    );
-
-    if (!formattedAmount)
-      throw new ApplicationError(DefaultErrorMessages.UNCAUGHT_EXCEPTION);
-
-    if (token?.id?.length) {
-      const unsignedTrc10TransactionRecord =
-        await this.tronWebInstance.transactionBuilder.sendAsset(
-          address.recipient,
-          formattedAmount,
-          token.id,
-          address.origin
+    switch (contractType) {
+      case ContractTypes.TRANSFER: {
+        const formattedAmount = this.formatAmount(
+          amount,
+          token?.id && token?.decimals ? +token.decimals : 0
         );
 
-      return unsignedTrc10TransactionRecord;
+        if (!formattedAmount)
+          throw new ApplicationError(DefaultErrorMessages.UNCAUGHT_EXCEPTION);
+
+        if (token?.id?.length) {
+          const unsignedTrc10TransactionRecord =
+            await this.tronWebInstance.transactionBuilder.sendAsset(
+              address.recipient,
+              formattedAmount,
+              token.id,
+              address.origin
+            );
+
+          return unsignedTrc10TransactionRecord;
+        }
+
+        const unsignedTrxTransactionRecord =
+          await this.tronWebInstance.transactionBuilder.sendTrx(
+            address.recipient,
+            formattedAmount,
+            address.origin
+          );
+
+        return unsignedTrxTransactionRecord;
+      }
+
+      case ContractTypes.FREEZE: {
+        const formattedAmount = this.formatAmount(amount);
+
+        if (!formattedAmount)
+          throw new ApplicationError(DefaultErrorMessages.UNCAUGHT_EXCEPTION);
+
+        const unsignedFreezeTransactionRecord =
+          await this.tronWebInstance.transactionBuilder.freezeBalanceV2(
+            formattedAmount,
+            resource!,
+            address.origin
+          );
+
+        return unsignedFreezeTransactionRecord;
+      }
+
+      default:
+        throw new ApplicationError(DefaultErrorMessages.UNCAUGHT_EXCEPTION);
     }
-
-    const unsignedTrxTransactionRecord =
-      await this.tronWebInstance.transactionBuilder.sendTrx(
-        address.recipient,
-        formattedAmount,
-        address.origin
-      );
-
-    return unsignedTrxTransactionRecord;
   }
 
   async signTransaction({
@@ -101,8 +157,8 @@ export class TronWebService {
     return signedTransactionRecord;
   }
 
-  async broadcastSignedTransaction(
-    signedTransactionPayload: TronWebService.BroadcastSignedTransactionParams
+  async broadcastTransaction(
+    signedTransactionPayload: TronWebService.BroadcastTransactionParams
   ) {
     const transaction = await this.tronWebInstance.trx.sendRawTransaction(
       signedTransactionPayload
@@ -113,17 +169,17 @@ export class TronWebService {
 }
 
 namespace TronWebService {
+  export type GetTransactionByIdParams = string;
   export type BuildTransactionRecordParams = {
+    contractType?: (typeof ContractTypes)[keyof typeof ContractTypes];
     amount: number;
     address: Record<'origin' | 'recipient', string>;
-    token?: {
-      id: string;
-      decimals: number;
-    };
+    token?: Record<'id' | 'decimals', string>;
+    resource?: (typeof ResourceTypes)[keyof typeof ResourceTypes];
   };
   export type SignTransactionParams = {
-    unsignedTransactionPayload: Transaction;
+    unsignedTransactionPayload: UnsignedTransaction;
     signingKey: string;
   };
-  export type BroadcastSignedTransactionParams = SignedTransaction;
+  export type BroadcastTransactionParams = Transaction;
 }

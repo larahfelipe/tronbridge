@@ -47,7 +47,7 @@ export class GetAccountController implements Controller {
         message = DefaultErrorMessages.INTERNAL_SERVER_ERROR
       } = e as ApplicationError;
 
-      return res.status(statusCode).send({ name, message });
+      return res.status(statusCode).send({ name, message, originalError: e });
     }
   }
 }

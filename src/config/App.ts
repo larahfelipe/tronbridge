@@ -35,7 +35,7 @@ export class App {
       this.app.log.info(
         `Bootstrap completed successfully and is now listening on ${address}`
       );
-      console.log(`\n> Listening at ${address}\n`);
+      console.log(`\nListening at ${address}\n`);
     });
   }
 }

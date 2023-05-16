@@ -35,8 +35,12 @@ export const getAccountControllerHandler = (
     : Networks.TESTNET;
 
   const tronGridService = TronGridService.getInstance(targetNetwork);
+  const tronWebService = TronWebService.getInstance(targetNetwork);
 
-  const getAccountUseCase = GetAccountUseCase.getInstance(tronGridService);
+  const getAccountUseCase = GetAccountUseCase.getInstance(
+    tronGridService,
+    tronWebService
+  );
 
   const getAccountController =
     GetAccountController.getInstance(getAccountUseCase);
