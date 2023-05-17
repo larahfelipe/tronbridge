@@ -14,19 +14,16 @@ export const CreateTransactionSchema = z.object({
   }),
   token: z
     .object({
-      id: z
-        .string()
-        .transform((value) => value.trim())
-        .optional(),
+      id: z.string().transform((value) => value.trim()),
       decimals: z
         .number()
         .nonnegative('Token decimals must be greater than or equal to 0')
-        .optional()
     })
     .refine(
       ({ id, decimals }) => (!id && decimals && decimals > 0 ? false : true),
       "Token ID is required when withdrawing a specific token. If you're withdrawing TRX, set the `id` and `decimals` parameters respectively to '' and `0`"
-    ),
+    )
+    .optional(),
   signingKey: z
     .string()
     .nonempty('Signing key is required')

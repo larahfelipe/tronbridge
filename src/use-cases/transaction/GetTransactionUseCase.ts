@@ -2,6 +2,7 @@ import { TransactionMessages } from '@/config';
 import type { Transaction } from '@/domain/models';
 import { NotFoundError } from '@/errors';
 import type { TronWebService } from '@/services';
+import { parseMaybeBigNum } from '@/utils';
 
 export class GetTransactionUseCase {
   private static INSTANCE: GetTransactionUseCase;
@@ -29,6 +30,10 @@ export class GetTransactionUseCase {
     if (!transactionExists)
       throw new NotFoundError(TransactionMessages.NOT_FOUND);
 
+    const transactionAmount =
+      transactionExists.raw_data.contract[0].parameter.value.amount ??
+      transactionExists.raw_data.contract[0].parameter.value.frozen_balance;
+
     const transaction: Transaction = {
       txID: transactionExists.txID,
       type: transactionExists.raw_data.contract[0].type,
@@ -41,14 +46,26 @@ export class GetTransactionUseCase {
           hex: transactionExists.raw_data.contract[0].parameter.value
             .owner_address
         },
-        recipient: {
-          base58: this.tronWebService.hexToBase58(
-            transactionExists.raw_data.contract[0].parameter.value.to_address
-          ),
-          hex: transactionExists.raw_data.contract[0].parameter.value.to_address
-        }
+        recipient: transactionExists.raw_data.contract[0].parameter.value
+          .to_address
+          ? {
+              base58: this.tronWebService.hexToBase58(
+                transactionExists.raw_data.contract[0].parameter.value
+                  .to_address
+              ),
+              hex: transactionExists.raw_data.contract[0].parameter.value
+                .to_address
+            }
+          : null
       },
-      amount: transactionExists.raw_data.contract[0].parameter.value.amount,
+      amount: {
+        raw: parseMaybeBigNum(transactionAmount),
+        fmt: parseMaybeBigNum(
+          this.tronWebService.formatAmount(transactionAmount, {
+            format: 'fromPrecision'
+          })
+        )
+      },
       block: {
         bytes: transactionExists.raw_data.ref_block_bytes,
         hash: transactionExists.raw_data.ref_block_hash

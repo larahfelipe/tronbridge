@@ -1,4 +1,4 @@
-export const parseBigNumValue = (rawValue: number) => {
+export const parseMaybeBigNum = (rawValue: number) => {
   let value = '0';
   if (!rawValue || rawValue <= 0) return value;
 

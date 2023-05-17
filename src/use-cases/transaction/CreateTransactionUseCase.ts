@@ -2,6 +2,7 @@ import { TransactionMessages } from '@/config';
 import type { Transaction } from '@/domain/models';
 import { ApplicationError } from '@/errors';
 import type { TronWebService } from '@/services';
+import { parseMaybeBigNum } from '@/utils';
 
 export class CreateTransactionUseCase {
   private static INSTANCE: CreateTransactionUseCase;
@@ -24,6 +25,8 @@ export class CreateTransactionUseCase {
   }
 
   async create(params: CreateTransactionUseCase.Params) {
+    const { signingKey, token } = params;
+
     const unsignedTransactionPayload =
       await this.tronWebService.buildTransactionRecord(params);
 
@@ -32,7 +35,7 @@ export class CreateTransactionUseCase {
 
     const signedTransactionPayload = await this.tronWebService.signTransaction({
       unsignedTransactionPayload,
-      signingKey: params.signingKey
+      signingKey
     });
 
     if (!signedTransactionPayload)
@@ -67,8 +70,18 @@ export class CreateTransactionUseCase {
             .to_address
         }
       },
-      amount:
-        newTransaction.transaction.raw_data.contract[0].parameter.value.amount,
+      amount: {
+        raw: parseMaybeBigNum(
+          newTransaction.transaction.raw_data.contract[0].parameter.value.amount
+        ),
+        fmt: parseMaybeBigNum(
+          this.tronWebService.formatAmount(
+            newTransaction.transaction.raw_data.contract[0].parameter.value
+              .amount,
+            { format: 'fromPrecision', decimals: token?.decimals }
+          )
+        )
+      },
       block: {
         bytes: newTransaction.transaction.raw_data.ref_block_bytes,
         hash: newTransaction.transaction.raw_data.ref_block_hash
@@ -89,10 +102,13 @@ export class CreateTransactionUseCase {
 
 namespace CreateTransactionUseCase {
   export type Params = {
-    address: Record<'origin' | 'recipient', string>;
-    signingKey: string;
     amount: number;
-    tokenID?: string;
+    address: Record<'origin' | 'recipient', string>;
+    token?: {
+      id: string;
+      decimals: number;
+    };
+    signingKey: string;
   };
   export type Result = {
     transaction: Transaction;

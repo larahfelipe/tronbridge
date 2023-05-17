@@ -13,6 +13,8 @@ export const ResourceTypes = {
   ENERGY: 'energy'
 } as const;
 
+export const TRX_DECIMALS = 6 as const;
+
 export const DefaultErrorMessages = {
   BAD_REQUEST: 'Invalid or corrupted request',
   NOT_FOUND: 'Resource not found',

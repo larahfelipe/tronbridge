@@ -4,6 +4,7 @@ import {
   ContractTypes,
   DefaultErrorMessages,
   Networks,
+  TRX_DECIMALS,
   type ResourceTypes
 } from '@/config';
 import { ApplicationError } from '@/errors';
@@ -46,22 +47,34 @@ export class TronWebService {
     return resources;
   }
 
-  async getAccountBandwidth(address: string) {
-    const bandwidth = await this.tronWebInstance.trx.getBandwidth(address);
-
-    return bandwidth;
-  }
-
-  formatAmount(rawAmount: number, customDecimals?: number) {
+  formatAmount(
+    rawAmount: number,
+    options: {
+      format?: 'toPrecision' | 'fromPrecision';
+      decimals?: number;
+    } = {}
+  ) {
     if (rawAmount <= 0)
       throw new ApplicationError('Formatting an invalid amount');
 
+    let { format, decimals } = options;
+
+    if (!format) format = 'toPrecision';
+    if (!decimals || decimals <= 0) decimals = TRX_DECIMALS;
+
     let amount: number | undefined;
 
-    if (customDecimals && customDecimals > 0) {
-      amount = rawAmount * 10 ** customDecimals;
-    } else {
-      amount = this.tronWebInstance.toSun(rawAmount);
+    switch (format) {
+      case 'toPrecision':
+        amount = rawAmount * 10 ** decimals;
+        break;
+
+      case 'fromPrecision':
+        amount = rawAmount / 10 ** decimals;
+        break;
+
+      default:
+        throw new ApplicationError('Provided an invalid format option');
     }
 
     return amount;
@@ -79,7 +92,7 @@ export class TronWebService {
     return account;
   }
 
-  async getTransactionById(txId: TronWebService.GetTransactionByIdParams) {
+  async getTransactionById(txId: string) {
     const transaction = await this.tronWebInstance.trx.getTransaction(txId);
 
     return transaction;
@@ -87,17 +100,16 @@ export class TronWebService {
 
   async buildTransactionRecord({
     contractType = ContractTypes.TRANSFER,
-    amount,
+    resource,
     address,
-    token,
-    resource
+    amount,
+    token
   }: TronWebService.BuildTransactionRecordParams) {
     switch (contractType) {
       case ContractTypes.TRANSFER: {
-        const formattedAmount = this.formatAmount(
-          amount,
-          token?.id && token?.decimals ? +token.decimals : 0
-        );
+        const formattedAmount = this.formatAmount(amount, {
+          decimals: token?.decimals
+        });
 
         if (!formattedAmount)
           throw new ApplicationError(DefaultErrorMessages.UNCAUGHT_EXCEPTION);
@@ -169,13 +181,15 @@ export class TronWebService {
 }
 
 namespace TronWebService {
-  export type GetTransactionByIdParams = string;
   export type BuildTransactionRecordParams = {
     contractType?: (typeof ContractTypes)[keyof typeof ContractTypes];
-    amount: number;
-    address: Record<'origin' | 'recipient', string>;
-    token?: Record<'id' | 'decimals', string>;
     resource?: (typeof ResourceTypes)[keyof typeof ResourceTypes];
+    address: Record<'origin' | 'recipient', string>;
+    amount: number;
+    token?: {
+      id: string;
+      decimals: number;
+    };
   };
   export type SignTransactionParams = {
     unsignedTransactionPayload: UnsignedTransaction;

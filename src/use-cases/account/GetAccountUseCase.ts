@@ -1,6 +1,6 @@
 import type { Account } from '@/domain/models';
 import type { TronGridService, TronWebService } from '@/services';
-import { parseBigNumValue } from '@/utils';
+import { parseMaybeBigNum } from '@/utils';
 
 export class GetAccountUseCase {
   private static INSTANCE: GetAccountUseCase;
@@ -55,13 +55,13 @@ export class GetAccountUseCase {
         const trc20Assets =
           accountExists.trc20?.map((item) => ({
             id: Object.keys(item)[0],
-            balance: parseBigNumValue(Object.values(item)[0])
+            balance: parseMaybeBigNum(Object.values(item)[0])
           })) ?? [];
 
         const trc10Assets =
           accountExists.assetV2?.map(({ key, value }) => ({
             id: key,
-            balance: parseBigNumValue(value)
+            balance: parseMaybeBigNum(value)
           })) ?? [];
 
         account = {
@@ -71,18 +71,22 @@ export class GetAccountUseCase {
             hex: accountExists.address
           },
           balance: {
-            raw: parseBigNumValue(accountExists.balance),
-            fmt: parseBigNumValue(accountExists.balance / 1e6)
+            raw: parseMaybeBigNum(accountExists.balance),
+            fmt: parseMaybeBigNum(
+              this.tronWebService.formatAmount(accountExists.balance, {
+                format: 'fromPrecision'
+              })
+            )
           },
           assets: [...trc20Assets, ...trc10Assets],
           resources: {
             bandwidth: {
-              used: parseBigNumValue(accountResources!.NetUsed),
-              limit: parseBigNumValue(accountResources!.NetLimit)
+              used: parseMaybeBigNum(accountResources!.NetUsed),
+              limit: parseMaybeBigNum(accountResources!.NetLimit)
             },
             energy: {
-              used: parseBigNumValue(accountResources!.EnergyUsed),
-              limit: parseBigNumValue(accountResources!.EnergyLimit)
+              used: parseMaybeBigNum(accountResources!.EnergyUsed),
+              limit: parseMaybeBigNum(accountResources!.EnergyLimit)
             }
           },
           createdAt: accountExists.create_time,

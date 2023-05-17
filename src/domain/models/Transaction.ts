@@ -6,7 +6,7 @@ export type Transaction = {
     origin: Record<'base58' | 'hex', string>;
     recipient: Record<'base58' | 'hex', string> | null;
   };
-  amount: number;
+  amount: Record<'raw' | 'fmt', string>;
   block: Record<'bytes' | 'hash', string>;
   signature: Array<string>;
   createdAt: number;

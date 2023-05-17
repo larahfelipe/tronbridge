@@ -2,6 +2,7 @@ import { ContractTypes, TransactionMessages } from '@/config';
 import type { Transaction } from '@/domain/models';
 import { ApplicationError } from '@/errors';
 import type { TronWebService } from '@/services';
+import { parseMaybeBigNum } from '@/utils';
 
 export class CreateStakingTransactionUseCase {
   private static INSTANCE: CreateStakingTransactionUseCase;
@@ -66,8 +67,18 @@ export class CreateStakingTransactionUseCase {
         },
         recipient: null
       },
-      amount:
-        newTransaction.transaction.raw_data.contract[0].parameter.value.amount,
+      amount: {
+        raw: parseMaybeBigNum(
+          newTransaction.transaction.raw_data.contract[0].parameter.value.amount
+        ),
+        fmt: parseMaybeBigNum(
+          this.tronWebService.formatAmount(
+            newTransaction.transaction.raw_data.contract[0].parameter.value
+              .amount,
+            { format: 'fromPrecision' }
+          )
+        )
+      },
       block: {
         bytes: newTransaction.transaction.raw_data.ref_block_bytes,
         hash: newTransaction.transaction.raw_data.ref_block_hash

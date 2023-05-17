@@ -42,6 +42,22 @@ declare module 'tronweb' {
     end_time: number;
   };
 
+  export type Block = {
+    blockID: string;
+    block_header: {
+      raw_data: {
+        number: number;
+        txTrieRoot: string;
+        witness_address: string;
+        parentHash: string;
+        version: number;
+        timestamp: number;
+      };
+      witness_signature: string;
+    };
+    transactions: Array<Transaction>;
+  };
+
   export type AccountResources = {
     freeNetLimit: number;
     assetNetUsed: Array<{ key: string; value: number }>;
@@ -61,6 +77,7 @@ declare module 'tronweb' {
     parameter: {
       value: {
         amount: number;
+        frozen_balance: number;
         owner_address: string;
         to_address: string;
       };
@@ -106,7 +123,6 @@ declare module 'tronweb' {
   export type TrxModule = {
     getTokenByID: (tokenId: string) => Promise<Maybe<Token>>;
     getTokenIssuedByAddress: (tokenAddress: string) => Promise<Maybe<Token>>;
-    getBandwidth: (address: string) => Promise<Maybe<number>>;
     getAccountResources: (address: string) => Promise<Maybe<AccountResources>>;
     getTransaction: (
       txId: string
@@ -131,7 +147,6 @@ declare module 'tronweb' {
     createAccount: () => Promise<Maybe<GeneratedAccount>>;
     createRandom: () => Promise<Maybe<GeneratedAccountWithMnemonic>>;
     fromMnemonic: () => Promise<Maybe<GeneratedAccountWithMnemonic>>;
-    toSun: (rawValue: number) => number;
     toUtf8: (hexValue: string) => string;
     transactionBuilder: TransactionBuilderModule;
     trx: TrxModule;
