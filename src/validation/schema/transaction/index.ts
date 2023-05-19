@@ -1,3 +1,3 @@
 export * from './CreateStakingTransactionSchema';
-export * from './CreateTransactionSchema';
+export * from './CreateTransferTransactionSchema';
 export * from './GetTransactionSchema';

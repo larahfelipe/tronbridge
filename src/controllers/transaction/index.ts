@@ -4,17 +4,17 @@ import { Networks } from '@/config';
 import { TronWebService } from '@/services';
 import {
   CreateStakingTransactionUseCase,
-  CreateTransactionUseCase,
+  CreateTransferTransactionUseCase,
   GetTransactionUseCase
 } from '@/use-cases/transaction';
 import type {
   CreateStakingTransactionSchemaType,
-  CreateTransactionSchemaType,
+  CreateTransferTransactionSchemaType,
   GetTransactionSchemaType
 } from '@/validation/schema';
 
 import { CreateStakingTransactionController } from './CreateStakingTransactionController';
-import { CreateTransactionController } from './CreateTransactionController';
+import { CreateTransferTransactionController } from './CreateTransferTransactionController';
 import { GetTransactionController } from './GetTransactionController';
 
 export const createStakingTransactionControllerHandler = (
@@ -38,8 +38,8 @@ export const createStakingTransactionControllerHandler = (
   return createStakingTransactionController.handle(req, res);
 };
 
-export const createTransactionControllerHandler = (
-  req: FastifyRequest<{ Body: CreateTransactionSchemaType }>,
+export const createTransferTransactionControllerHandler = (
+  req: FastifyRequest<{ Body: CreateTransferTransactionSchemaType }>,
   res: FastifyReply
 ) => {
   const targetNetwork = req.routerPath.endsWith(Networks.MAINNET)
@@ -48,14 +48,15 @@ export const createTransactionControllerHandler = (
 
   const tronWebService = TronWebService.getInstance(targetNetwork);
 
-  const createTransactionUseCase =
-    CreateTransactionUseCase.getInstance(tronWebService);
+  const createTransferTransactionUseCase =
+    CreateTransferTransactionUseCase.getInstance(tronWebService);
 
-  const createTransactionController = CreateTransactionController.getInstance(
-    createTransactionUseCase
-  );
+  const createTransferTransactionController =
+    CreateTransferTransactionController.getInstance(
+      createTransferTransactionUseCase
+    );
 
-  return createTransactionController.handle(req, res);
+  return createTransferTransactionController.handle(req, res);
 };
 
 export const getTransactionControllerHandler = (

@@ -1,4 +1,4 @@
-import { ContractTypes, TransactionMessages } from '@/config';
+import { ContractTypes, TRX, TransactionMessages } from '@/config';
 import type { Transaction } from '@/domain/models';
 import { ApplicationError } from '@/errors';
 import type { TronWebService } from '@/services';
@@ -56,6 +56,7 @@ export class CreateStakingTransactionUseCase {
       txID: newTransaction.transaction.txID,
       type: newTransaction.transaction.raw_data.contract[0].type,
       isBroadcasted: newTransaction.result,
+      assetID: TRX.SYMBOL,
       address: {
         origin: {
           base58: this.tronWebService.hexToBase58(

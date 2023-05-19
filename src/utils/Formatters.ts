@@ -1,8 +1,7 @@
-export const parseMaybeBigNum = (rawValue: number) => {
-  let value = '0';
-  if (!rawValue || rawValue <= 0) return value;
+export const parseMaybeBigNum = (rawValue: number, fallback = '0') => {
+  if (!rawValue || rawValue <= 0) return fallback;
 
-  value = rawValue.toLocaleString('en-US', { useGrouping: false });
+  const value = rawValue.toLocaleString('en-US', { useGrouping: false });
 
   return value;
 };

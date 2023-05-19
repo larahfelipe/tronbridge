@@ -1,10 +1,15 @@
-import TronWeb, { type Transaction, type UnsignedTransaction } from 'tronweb';
+import TronWeb, {
+  type SmartContractTransactionFunctionSelectorParams,
+  type SmartContractTransactionOptions,
+  type Transaction,
+  type UnsignedTransaction
+} from 'tronweb';
 
 import {
   ContractTypes,
   DefaultErrorMessages,
   Networks,
-  TRX_DECIMALS,
+  TRX,
   type ResourceTypes
 } from '@/config';
 import { ApplicationError } from '@/errors';
@@ -60,7 +65,7 @@ export class TronWebService {
     let { format, decimals } = options;
 
     if (!format) format = 'toPrecision';
-    if (!decimals || decimals <= 0) decimals = TRX_DECIMALS;
+    if (!decimals || decimals <= 0) decimals = TRX.DECIMALS;
 
     let amount: number | undefined;
 
@@ -86,10 +91,24 @@ export class TronWebService {
     return base58Value;
   }
 
+  base58ToHex(base58Value: string) {
+    const hexValue = this.tronWebInstance.address.toHex(base58Value);
+
+    return hexValue;
+  }
+
   async createAccount() {
     const account = await this.tronWebInstance.createAccount();
 
     return account;
+  }
+
+  async getContractByAddress(contractAddress: string) {
+    const contract = await this.tronWebInstance.trx.getContract(
+      contractAddress
+    );
+
+    return contract;
   }
 
   async getTransactionById(txId: string) {
@@ -115,15 +134,49 @@ export class TronWebService {
           throw new ApplicationError(DefaultErrorMessages.UNCAUGHT_EXCEPTION);
 
         if (token?.id?.length) {
-          const unsignedTrc10TransactionRecord =
-            await this.tronWebInstance.transactionBuilder.sendAsset(
-              address.recipient,
-              formattedAmount,
+          const isAssetAnSmartContract = await this.getContractByAddress(
+            token.id
+          );
+
+          if (!isAssetAnSmartContract?.contract_address?.length) {
+            const unsignedTrc10TransactionRecord =
+              await this.tronWebInstance.transactionBuilder.sendAsset(
+                address.recipient,
+                formattedAmount,
+                token.id,
+                address.origin
+              );
+
+            return unsignedTrc10TransactionRecord;
+          }
+
+          const contractTransactionOptions: SmartContractTransactionOptions = {
+            callValue: 0,
+            feeLimit: 100000000
+          };
+
+          const contractTransferFunctionParams: Array<SmartContractTransactionFunctionSelectorParams> =
+            [
+              {
+                type: 'address',
+                value: address.recipient
+              },
+              {
+                type: 'uint256',
+                value: formattedAmount
+              }
+            ];
+
+          const unsignedSmartContractTransactionRecord =
+            await this.tronWebInstance.transactionBuilder.triggerSmartContract(
               token.id,
+              'transfer(address,uint256)',
+              contractTransactionOptions,
+              contractTransferFunctionParams,
               address.origin
             );
 
-          return unsignedTrc10TransactionRecord;
+          return unsignedSmartContractTransactionRecord?.transaction;
         }
 
         const unsignedTrxTransactionRecord =

@@ -1,3 +1,3 @@
 export * from './CreateStakingTransactionUseCase';
-export * from './CreateTransactionUseCase';
+export * from './CreateTransferTransactionUseCase';
 export * from './GetTransactionUseCase';

@@ -72,6 +72,27 @@ declare module 'tronweb' {
     TotalEnergyWeight: number;
   };
 
+  export type Contract = {
+    bytecode: string;
+    name: string;
+    origin_address: string;
+    contract_address: string;
+    abi: Record<'entrys', unknown>;
+  };
+
+  export type SmartContractTransactionOptions = {
+    feeLimit?: number;
+    callValue?: number;
+    tokenId?: string;
+    tokenValue?: number;
+    Permission_id?: number;
+  };
+
+  export type SmartContractTransactionFunctionSelectorParams = {
+    type: string;
+    value: string | number;
+  };
+
   export type TransactionContract = {
     type: string;
     parameter: {
@@ -105,6 +126,13 @@ declare module 'tronweb' {
       resource: string,
       address: string
     ) => Promise<Maybe<UnsignedTransaction>>;
+    triggerSmartContract: (
+      contractAddress: string,
+      functionSelector: string,
+      txOptions: SmartContractTransactionOptions,
+      functionSelectorParameters: Array<SmartContractTransactionFunctionSelectorParams>,
+      recipientAddress: string
+    ) => Promise<Maybe<Record<'transaction', UnsignedTransaction>>>;
     sendTrx: (
       to: string,
       amount: number,
@@ -124,6 +152,7 @@ declare module 'tronweb' {
     getTokenByID: (tokenId: string) => Promise<Maybe<Token>>;
     getTokenIssuedByAddress: (tokenAddress: string) => Promise<Maybe<Token>>;
     getAccountResources: (address: string) => Promise<Maybe<AccountResources>>;
+    getContract: (contractAddress: string) => Promise<Maybe<Contract>>;
     getTransaction: (
       txId: string
     ) => Promise<
@@ -140,6 +169,7 @@ declare module 'tronweb' {
 
   export type AddressModule = {
     fromHex: (hexValue: string) => string;
+    toHex: (base58Value: string) => string;
   };
 
   export default class TronWeb {

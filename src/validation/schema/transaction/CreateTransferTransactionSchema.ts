@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CreateTransactionSchema = z.object({
+export const CreateTransferTransactionSchema = z.object({
   amount: z.number().positive('Amount must be greater than 0'),
   address: z.object({
     origin: z
@@ -30,6 +30,6 @@ export const CreateTransactionSchema = z.object({
     .transform((value) => value.trim())
 });
 
-export type CreateTransactionSchemaType = z.infer<
-  typeof CreateTransactionSchema
+export type CreateTransferTransactionSchemaType = z.infer<
+  typeof CreateTransferTransactionSchema
 >;

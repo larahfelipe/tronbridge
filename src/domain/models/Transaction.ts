@@ -1,6 +1,7 @@
 export type Transaction = {
   txID: string;
   type: string;
+  assetID: string;
   isBroadcasted: boolean;
   address: {
     origin: Record<'base58' | 'hex', string>;

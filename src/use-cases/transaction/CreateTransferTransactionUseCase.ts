@@ -1,11 +1,11 @@
-import { TransactionMessages } from '@/config';
+import { TRX, TransactionMessages } from '@/config';
 import type { Transaction } from '@/domain/models';
 import { ApplicationError } from '@/errors';
 import type { TronWebService } from '@/services';
 import { parseMaybeBigNum } from '@/utils';
 
-export class CreateTransactionUseCase {
-  private static INSTANCE: CreateTransactionUseCase;
+export class CreateTransferTransactionUseCase {
+  private static INSTANCE: CreateTransferTransactionUseCase;
   private readonly tronWebService: TronWebService;
 
   private constructor(tronWebService: TronWebService) {
@@ -14,18 +14,18 @@ export class CreateTransactionUseCase {
 
   static getInstance(tronWebService: TronWebService) {
     if (
-      !CreateTransactionUseCase.INSTANCE ||
-      CreateTransactionUseCase.INSTANCE.tronWebService !== tronWebService
-    )
-      CreateTransactionUseCase.INSTANCE = new CreateTransactionUseCase(
+      !CreateTransferTransactionUseCase.INSTANCE ||
+      CreateTransferTransactionUseCase.INSTANCE.tronWebService !==
         tronWebService
-      );
+    )
+      CreateTransferTransactionUseCase.INSTANCE =
+        new CreateTransferTransactionUseCase(tronWebService);
 
-    return CreateTransactionUseCase.INSTANCE;
+    return CreateTransferTransactionUseCase.INSTANCE;
   }
 
-  async create(params: CreateTransactionUseCase.Params) {
-    const { signingKey, token } = params;
+  async create(params: CreateTransferTransactionUseCase.Params) {
+    const { signingKey, token, amount, address } = params;
 
     const unsignedTransactionPayload =
       await this.tronWebService.buildTransactionRecord(params);
@@ -52,6 +52,7 @@ export class CreateTransactionUseCase {
       txID: newTransaction.transaction.txID,
       type: newTransaction.transaction.raw_data.contract[0].type,
       isBroadcasted: newTransaction.result,
+      assetID: token?.id?.length ? token.id : TRX.SYMBOL,
       address: {
         origin: {
           base58: this.tronWebService.hexToBase58(
@@ -62,24 +63,31 @@ export class CreateTransactionUseCase {
             .owner_address
         },
         recipient: {
-          base58: this.tronWebService.hexToBase58(
+          base58:
+            this.tronWebService.hexToBase58(
+              newTransaction.transaction.raw_data.contract[0].parameter.value
+                .to_address
+            ) ?? address.recipient,
+          hex:
             newTransaction.transaction.raw_data.contract[0].parameter.value
-              .to_address
-          ),
-          hex: newTransaction.transaction.raw_data.contract[0].parameter.value
-            .to_address
+              .to_address ?? this.tronWebService.base58ToHex(address.recipient)
         }
       },
       amount: {
         raw: parseMaybeBigNum(
-          newTransaction.transaction.raw_data.contract[0].parameter.value.amount
+          newTransaction.transaction.raw_data.contract[0].parameter.value
+            .amount,
+          this.tronWebService
+            .formatAmount(amount, { decimals: token?.decimals })
+            .toString()
         ),
         fmt: parseMaybeBigNum(
           this.tronWebService.formatAmount(
             newTransaction.transaction.raw_data.contract[0].parameter.value
               .amount,
             { format: 'fromPrecision', decimals: token?.decimals }
-          )
+          ),
+          amount.toString()
         )
       },
       block: {
@@ -91,7 +99,7 @@ export class CreateTransactionUseCase {
       expiresAt: newTransaction.transaction.raw_data.expiration
     };
 
-    const res: CreateTransactionUseCase.Result = {
+    const res: CreateTransferTransactionUseCase.Result = {
       transaction,
       message: TransactionMessages.CREATED
     };
@@ -100,7 +108,7 @@ export class CreateTransactionUseCase {
   }
 }
 
-namespace CreateTransactionUseCase {
+namespace CreateTransferTransactionUseCase {
   export type Params = {
     amount: number;
     address: Record<'origin' | 'recipient', string>;
