@@ -101,6 +101,7 @@ declare module 'tronweb' {
         frozen_balance: number;
         owner_address: string;
         to_address: string;
+        contract_address: string;
       };
       type_url: string;
     };

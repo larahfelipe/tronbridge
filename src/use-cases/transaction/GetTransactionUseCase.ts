@@ -1,4 +1,4 @@
-import { TransactionMessages } from '@/config';
+import { TRX, TransactionMessages } from '@/config';
 import type { Transaction } from '@/domain/models';
 import { NotFoundError } from '@/errors';
 import type { TronWebService } from '@/services';
@@ -30,6 +30,12 @@ export class GetTransactionUseCase {
     if (!transactionExists)
       throw new NotFoundError(TransactionMessages.NOT_FOUND);
 
+    const smartContractAddress =
+      transactionExists.raw_data.contract[0].parameter.value.contract_address;
+
+    const recipientAddress =
+      transactionExists.raw_data.contract[0].parameter.value.to_address;
+
     const transactionAmount =
       transactionExists.raw_data.contract[0].parameter.value.amount ??
       transactionExists.raw_data.contract[0].parameter.value.frozen_balance;
@@ -38,6 +44,7 @@ export class GetTransactionUseCase {
       txID: transactionExists.txID,
       type: transactionExists.raw_data.contract[0].type,
       isBroadcasted: transactionExists.ret[0].contractRet === 'SUCCESS',
+      assetID: smartContractAddress ? smartContractAddress : TRX.SYMBOL,
       address: {
         origin: {
           base58: this.tronWebService.hexToBase58(
@@ -46,15 +53,10 @@ export class GetTransactionUseCase {
           hex: transactionExists.raw_data.contract[0].parameter.value
             .owner_address
         },
-        recipient: transactionExists.raw_data.contract[0].parameter.value
-          .to_address
+        recipient: recipientAddress
           ? {
-              base58: this.tronWebService.hexToBase58(
-                transactionExists.raw_data.contract[0].parameter.value
-                  .to_address
-              ),
-              hex: transactionExists.raw_data.contract[0].parameter.value
-                .to_address
+              base58: this.tronWebService.hexToBase58(recipientAddress),
+              hex: recipientAddress
             }
           : null
       },
