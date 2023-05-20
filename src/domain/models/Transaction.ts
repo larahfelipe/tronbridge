@@ -8,7 +8,16 @@ export type Transaction = {
     recipient: Record<'base58' | 'hex', string> | null;
   };
   amount: Record<'raw' | 'fmt', string>;
-  block: Record<'bytes' | 'hash', string>;
+  block: {
+    number?: number;
+    bytes: string;
+    hash: string;
+  };
+  resource?: {
+    bandwidthUsage?: number;
+    energyUsage?: number;
+    energyPenalty?: number;
+  };
   signature: Array<string>;
   createdAt: number;
   expiresAt: number;

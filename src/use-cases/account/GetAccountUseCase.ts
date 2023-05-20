@@ -44,13 +44,12 @@ export class GetAccountUseCase {
           }
         } as Account;
 
-        const accountExists = await this.tronGridService.getAccount(address);
+        const [accountExists, accountResources] = await Promise.all([
+          this.tronGridService.getAccount(address),
+          this.tronWebService.getAccountResources(address)
+        ]);
 
         if (!accountExists) return account;
-
-        const accountResources = await this.tronWebService.getAccountResources(
-          address
-        );
 
         const trc20Assets =
           accountExists.trc20?.map((item) => ({

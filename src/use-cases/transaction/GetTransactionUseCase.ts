@@ -25,7 +25,10 @@ export class GetTransactionUseCase {
   }
 
   async get({ id }: GetTransactionUseCase.Params) {
-    const transactionExists = await this.tronWebService.getTransactionById(id);
+    const [transactionExists, transactionInfoExists] = await Promise.all([
+      this.tronWebService.getTransactionById(id),
+      this.tronWebService.getTransactionInfoById(id)
+    ]);
 
     if (!transactionExists)
       throw new NotFoundError(TransactionMessages.NOT_FOUND);
@@ -69,8 +72,14 @@ export class GetTransactionUseCase {
         )
       },
       block: {
+        number: transactionInfoExists?.blockNumber,
         bytes: transactionExists.raw_data.ref_block_bytes,
         hash: transactionExists.raw_data.ref_block_hash
+      },
+      resource: {
+        bandwidthUsage: transactionInfoExists?.receipt?.net_usage,
+        energyUsage: transactionInfoExists?.receipt?.energy_usage,
+        energyPenalty: transactionInfoExists?.receipt?.energy_penalty_total
       },
       signature: transactionExists.signature,
       createdAt: transactionExists.raw_data.timestamp,

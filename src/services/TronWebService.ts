@@ -118,6 +118,14 @@ export class TronWebService {
     return transaction;
   }
 
+  async getTransactionInfoById(txId: string) {
+    const transactionInfo = await this.tronWebInstance.trx.getTransactionInfo(
+      txId
+    );
+
+    return transactionInfo;
+  }
+
   async buildTransactionRecord({
     contractType = ContractTypes.TRANSFER,
     resource,

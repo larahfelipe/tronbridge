@@ -120,6 +120,37 @@ declare module 'tronweb' {
     };
   };
 
+  export type TransactionLog = {
+    address: string;
+    topics: Array<unknown>;
+    data: string;
+  };
+
+  export type InternalTransactions = {
+    hash: string;
+    caller_address: string;
+    transferTo_address: string;
+    callValueInfo: Array<unknown>;
+    note: string;
+  };
+
+  export type TransactionInfo = {
+    id: string;
+    fee: number;
+    blockNumber: number;
+    blockTimeStamp: number;
+    contractResult: Array<unknown>;
+    receipt: {
+      result?: string;
+      net_usage?: number;
+      energy_usage?: number;
+      energy_usage_total?: number;
+      energy_penalty_total?: number;
+    };
+    log: Array<TransactionLog>;
+    internal_transactions: Array<InternalTransactions>;
+  };
+
   export type Transaction = UnsignedTransaction & Record<'signature', [string]>;
 
   export type TransactionBuilderModule = {
@@ -160,6 +191,7 @@ declare module 'tronweb' {
     ) => Promise<
       Maybe<Transaction & Record<'ret', Array<Record<'contractRet', string>>>>
     >;
+    getTransactionInfo: (txId: string) => Promise<Maybe<TransactionInfo>>;
     sign: (
       unsignedTransaction: UnsignedTransaction,
       privateKey: string

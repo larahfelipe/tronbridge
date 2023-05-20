@@ -25,7 +25,7 @@ export class CreateAccountUseCase {
   async create() {
     const newAccount = await this.tronWebService.createAccount();
 
-    if (!newAccount?.privateKey)
+    if (!newAccount?.privateKey?.length)
       throw new ApplicationError(AccountMessages.CREATION_EXCEPTION);
 
     const res: CreateAccountUseCase.Result = {
