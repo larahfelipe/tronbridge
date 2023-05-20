@@ -12,7 +12,7 @@ export const createAccountControllerHandler = (
   req: FastifyRequest,
   res: FastifyReply
 ) => {
-  const targetNetwork = req.routerPath.endsWith(Networks.MAINNET)
+  const targetNetwork = req.routerPath.includes(Networks.MAINNET)
     ? Networks.MAINNET
     : Networks.TESTNET;
 
@@ -30,7 +30,7 @@ export const getAccountControllerHandler = (
   req: FastifyRequest<{ Querystring: GetAccountSchemaType }>,
   res: FastifyReply
 ) => {
-  const targetNetwork = req.routerPath.endsWith(Networks.MAINNET)
+  const targetNetwork = req.routerPath.includes(Networks.MAINNET)
     ? Networks.MAINNET
     : Networks.TESTNET;
 

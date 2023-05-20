@@ -7,6 +7,7 @@ declare module 'tronweb' {
     solidityNode?: string;
     eventServer?: string;
     privateKey?: string;
+    headers?: Record<string, string>;
   };
 
   export type GeneratedAccount = {

@@ -1,4 +1,5 @@
 import TronWeb, {
+  type Config,
   type SmartContractTransactionFunctionSelectorParams,
   type SmartContractTransactionOptions,
   type Transaction,
@@ -20,7 +21,7 @@ export class TronWebService {
   private readonly network: (typeof Networks)[keyof typeof Networks];
 
   private constructor(network: (typeof Networks)[keyof typeof Networks]) {
-    const connectionOptions =
+    const connectionConfig: Config =
       network === Networks.MAINNET
         ? {
             fullNode: 'https://api.trongrid.io',
@@ -33,7 +34,7 @@ export class TronWebService {
             eventServer: 'https://api.shasta.trongrid.io'
           };
 
-    this.tronWebInstance = new TronWeb(connectionOptions);
+    this.tronWebInstance = new TronWeb(connectionConfig);
     this.network = network;
   }
 

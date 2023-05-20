@@ -21,7 +21,7 @@ export const createStakingTransactionControllerHandler = (
   req: FastifyRequest<{ Body: CreateStakingTransactionSchemaType }>,
   res: FastifyReply
 ) => {
-  const targetNetwork = req.routerPath.endsWith(Networks.MAINNET)
+  const targetNetwork = req.routerPath.includes(Networks.MAINNET)
     ? Networks.MAINNET
     : Networks.TESTNET;
 
@@ -42,7 +42,7 @@ export const createTransferTransactionControllerHandler = (
   req: FastifyRequest<{ Body: CreateTransferTransactionSchemaType }>,
   res: FastifyReply
 ) => {
-  const targetNetwork = req.routerPath.endsWith(Networks.MAINNET)
+  const targetNetwork = req.routerPath.includes(Networks.MAINNET)
     ? Networks.MAINNET
     : Networks.TESTNET;
 
@@ -63,7 +63,7 @@ export const getTransactionControllerHandler = (
   req: FastifyRequest<{ Querystring: GetTransactionSchemaType }>,
   res: FastifyReply
 ) => {
-  const targetNetwork = req.routerPath.endsWith(Networks.MAINNET)
+  const targetNetwork = req.routerPath.includes(Networks.MAINNET)
     ? Networks.MAINNET
     : Networks.TESTNET;
 
