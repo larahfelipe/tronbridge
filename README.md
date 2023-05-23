@@ -30,17 +30,24 @@ Transaction:
     "token": {
       "id": <TOKEN_ID>,
       "decimals": <TOKEN_DECIMALS>,
+      "gasLimit": <GAS_LIMIT>,
     },
     "signingKey": <ORIGIN_PRIVATE_KEY>
   }
 
   P.S:
-    1. <AMOUNT> is the amount of asset that will be sent to the recipient, format is number;
-    2. <ORIGIN_ADDRESS> is the origin address of the transaction;
-    3. <RECIPIENT_ADDRESS> is the recipient address of the transaction;
-    4. <TOKEN_ID> is the token id of the asset that will be sent to the recipient, if leave empty, it will be considered as TRX;
-    5. <TOKEN_DECIMALS> is the decimals of the asset that will be sent to the recipient, if leave empty, it will be considered as 6;
-    6. <ORIGIN_PRIVATE_KEY> is the private key of the origin address, it will be used to sign the transaction.
+    1. <AMOUNT> [NUMBER] is the amount of asset that will be sent to the recipient (*);
+    2. <ORIGIN_ADDRESS> [STRING] is the origin address of the transaction;
+    3. <RECIPIENT_ADDRESS> [STRING] is the recipient address of the transaction;
+    4. <TOKEN_ID> [STRING] is the token id of the asset that will be sent to the recipient (**);
+    5. <TOKEN_DECIMALS> [NUMBER] is the decimals of the asset that will be sent to the recipient (***);
+    6. <GAS_LIMIT> [NUMBER] is the maximum gas consumption for the smart contract transaction (*)(****);
+    7. <ORIGIN_PRIVATE_KEY> [STRING] is the private key of the origin address, it will be used to sign the transaction.
+
+  * The amount should be provided without multiplying by decimals, use the actual amount as it is.
+  ** If the token id is not provided/left empty (`""`), it will be considered as TRX transaction.
+  *** If the token decimals is not provided/left empty (`0`), it will default to `6` (TRX decimals).
+  **** If it's not a smart contract transaction, the gas limit can be ignored and leave empty (`0`).
 
 - POST /v1/transaction/mainnet/staking
   body: {
@@ -51,8 +58,10 @@ Transaction:
   }
 
   P.S:
-    1. <RESOURCE_TYPE> is the type of resource that will be staked, it can be "BANDWIDTH" or "ENERGY";
-    2. <AMOUNT> is the amount of resource that will be staked, format is number;
-    3. <ORIGIN_ADDRESS> is the origin address of the transaction;
-    4. <ORIGIN_PRIVATE_KEY> is the private key of the origin address, it will be used to sign the transaction.
+    1. <RESOURCE_TYPE> [STRING] is the type of resource that will be staked, it can be "BANDWIDTH" or "ENERGY";
+    2. <AMOUNT> [NUMBER] is the amount of resource that will be staked (*);
+    3. <ORIGIN_ADDRESS> [STRING] is the origin address of the transaction;
+    4. <ORIGIN_PRIVATE_KEY> [STRING] is the private key of the origin address, it will be used to sign the transaction.
+
+  * The amount should be provided without multiplying by decimals, use the actual amount as it is.
 ```

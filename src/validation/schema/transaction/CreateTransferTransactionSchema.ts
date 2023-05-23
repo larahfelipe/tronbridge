@@ -17,7 +17,10 @@ export const CreateTransferTransactionSchema = z.object({
       id: z.string().transform((value) => value.trim()),
       decimals: z
         .number()
-        .nonnegative('Token decimals must be greater than or equal to 0')
+        .nonnegative('Token decimals must be greater than or equal to 0'),
+      gasLimit: z
+        .number()
+        .nonnegative('Gas limit must be greater than or equal to 0')
     })
     .refine(
       ({ id, decimals }) => (!id && decimals && decimals > 0 ? false : true),

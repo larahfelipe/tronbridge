@@ -115,6 +115,7 @@ namespace CreateTransferTransactionUseCase {
     token?: {
       id: string;
       decimals: number;
+      gasLimit: number;
     };
     signingKey: string;
   };

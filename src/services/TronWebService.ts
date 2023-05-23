@@ -160,8 +160,9 @@ export class TronWebService {
           }
 
           const contractTransactionOptions: SmartContractTransactionOptions = {
-            callValue: 0,
-            feeLimit: 100000000
+            callValue: 0, // The amount of TRX transferred with this transaction
+            feeLimit:
+              token?.gasLimit > 0 ? this.formatAmount(token.gasLimit) : 50000000 // Max fee willing to pay for this tx (50 TRX by default)
           };
 
           const contractTransferFunctionParams: Array<SmartContractTransactionFunctionSelectorParams> =
@@ -251,6 +252,7 @@ namespace TronWebService {
     token?: {
       id: string;
       decimals: number;
+      gasLimit: number;
     };
   };
   export type SignTransactionParams = {
