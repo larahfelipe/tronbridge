@@ -2,8 +2,8 @@
   "name": "tronbridge",
   "version": "0.0.0",
   "main": "Server.js",
-  "repository": "https://github.com/larafe1/tronbridge.git",
-  "author": "larafe1",
+  "repository": "https://github.com/larahfelipe/tronbridge.git",
+  "author": "larahfelipe",
   "license": "MIT",
   "scripts": {
     "start": "node -r ts-node/register -r tsconfig-paths/register dist/Server.js",
