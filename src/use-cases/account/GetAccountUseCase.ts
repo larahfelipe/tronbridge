@@ -78,7 +78,7 @@ export class GetAccountUseCase {
             )
           },
           assets: [...trc20Assets, ...trc10Assets],
-          resources: {
+          resource: {
             bandwidth: {
               used: parseMaybeBigNum(accountResources!.NetUsed),
               limit: parseMaybeBigNum(accountResources!.NetLimit)

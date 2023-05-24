@@ -3,7 +3,7 @@ export type Account = {
   address: Record<'base58' | 'hex', string>;
   balance: Record<'raw' | 'fmt', string>;
   assets: Array<Record<'id' | 'balance', string>>;
-  resources: {
+  resource: {
     bandwidth: Record<'used' | 'limit', string>;
     energy: Record<'used' | 'limit', string>;
   };
