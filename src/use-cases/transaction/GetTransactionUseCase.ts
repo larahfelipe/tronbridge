@@ -46,8 +46,12 @@ export class GetTransactionUseCase {
     const transaction: Transaction = {
       txID: transactionExists.txID,
       type: transactionExists.raw_data.contract[0].type,
-      isBroadcasted: transactionExists.ret[0].contractRet === 'SUCCESS',
-      assetID: smartContractAddress ? smartContractAddress : TRX.SYMBOL,
+      isBroadcasted:
+        transactionExists.ret[0].contractRet === 'SUCCESS' ||
+        transactionInfoExists?.receipt.result === 'SUCCESS',
+      assetID: smartContractAddress
+        ? this.tronWebService.hexToBase58(smartContractAddress)
+        : TRX.SYMBOL,
       address: {
         origin: {
           base58: this.tronWebService.hexToBase58(
@@ -77,9 +81,19 @@ export class GetTransactionUseCase {
         hash: transactionExists.raw_data.ref_block_hash
       },
       resource: {
+        type: transactionExists.raw_data.contract[0].parameter.value.resource,
         bandwidthUsage: transactionInfoExists?.receipt?.net_usage,
         energyUsage: transactionInfoExists?.receipt?.energy_usage,
-        energyPenalty: transactionInfoExists?.receipt?.energy_penalty_total
+        energyPenalty: transactionInfoExists?.receipt?.energy_penalty_total,
+        gasLimit: {
+          raw: parseMaybeBigNum(transactionExists.raw_data.fee_limit),
+          fmt: parseMaybeBigNum(
+            this.tronWebService.formatAmount(
+              transactionExists.raw_data.fee_limit,
+              { format: 'fromPrecision' }
+            )
+          )
+        }
       },
       signature: transactionExists.signature,
       createdAt: transactionExists.raw_data.timestamp,

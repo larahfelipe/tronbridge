@@ -24,13 +24,13 @@ Transaction:
   body: {
     "amount": <AMOUNT>,
     "address": {
-      "origin": <ORIGIN_ADDRESS>
+      "origin": <ORIGIN_ADDRESS>,
       "recipient": <RECIPIENT_ADDRESS>
     },
     "token": {
       "id": <TOKEN_ID>,
       "decimals": <TOKEN_DECIMALS>,
-      "gasLimit": <GAS_LIMIT>,
+      "gasLimit": <GAS_LIMIT>
     },
     "signingKey": <ORIGIN_PRIVATE_KEY>
   }
@@ -51,17 +51,21 @@ Transaction:
 
 - POST /v1/transaction/mainnet/staking
   body: {
-    "resourceType": <RESOURCE_TYPE>,
     "amount": <AMOUNT>,
-    "address": <ORIGIN_ADDRESS>
+    "address": <ORIGIN_ADDRESS>,
+    "resourceType": <RESOURCE_TYPE>,
     "signingKey": <ORIGIN_PRIVATE_KEY>
   }
 
   P.S:
-    1. <RESOURCE_TYPE> [STRING] is the type of resource that will be staked, it can be "BANDWIDTH" or "ENERGY";
-    2. <AMOUNT> [NUMBER] is the amount of resource that will be staked (*);
-    3. <ORIGIN_ADDRESS> [STRING] is the origin address of the transaction;
+    1. <AMOUNT> [NUMBER] is the amount of resource that will be staked (*);
+    2. <ORIGIN_ADDRESS> [STRING] is the origin address of the transaction;
+    3. <RESOURCE_TYPE> [STRING] is the type of resource that will be staked, it can be "BANDWIDTH" or "ENERGY";
     4. <ORIGIN_PRIVATE_KEY> [STRING] is the private key of the origin address, it will be used to sign the transaction.
 
   * The amount should be provided without multiplying by decimals, use the actual amount as it is.
+
+--
+
+If you wanna contribute to this project, please feel free to fork it and open a PR.
 ```

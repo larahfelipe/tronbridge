@@ -14,9 +14,11 @@ export type Transaction = {
     hash: string;
   };
   resource?: {
+    type?: string;
     bandwidthUsage?: number;
     energyUsage?: number;
     energyPenalty?: number;
+    gasLimit?: Record<'raw' | 'fmt', string>;
   };
   signature: Array<string>;
   createdAt: number;

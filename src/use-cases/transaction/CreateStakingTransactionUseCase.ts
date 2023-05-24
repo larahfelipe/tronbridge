@@ -1,4 +1,9 @@
-import { ContractTypes, TRX, TransactionMessages } from '@/config';
+import {
+  ContractTypes,
+  TRX,
+  TransactionMessages,
+  type ResourceTypes
+} from '@/config';
 import type { Transaction } from '@/domain/models';
 import { ApplicationError } from '@/errors';
 import type { TronWebService } from '@/services';
@@ -24,12 +29,14 @@ export class CreateStakingTransactionUseCase {
   }
 
   async create(params: CreateStakingTransactionUseCase.Params) {
+    const { address, signingKey, resourceType } = params;
+
     const unsignedTransactionPayload =
       await this.tronWebService.buildTransactionRecord({
         ...params,
         contractType: ContractTypes.FREEZE,
         address: {
-          origin: params.address,
+          origin: address,
           recipient: ''
         }
       });
@@ -39,7 +46,7 @@ export class CreateStakingTransactionUseCase {
 
     const signedTransactionPayload = await this.tronWebService.signTransaction({
       unsignedTransactionPayload,
-      signingKey: params.signingKey
+      signingKey
     });
 
     if (!signedTransactionPayload)
@@ -70,12 +77,13 @@ export class CreateStakingTransactionUseCase {
       },
       amount: {
         raw: parseMaybeBigNum(
-          newTransaction.transaction.raw_data.contract[0].parameter.value.amount
+          newTransaction.transaction.raw_data.contract[0].parameter.value
+            .frozen_balance
         ),
         fmt: parseMaybeBigNum(
           this.tronWebService.formatAmount(
             newTransaction.transaction.raw_data.contract[0].parameter.value
-              .amount,
+              .frozen_balance,
             { format: 'fromPrecision' }
           )
         )
@@ -83,6 +91,9 @@ export class CreateStakingTransactionUseCase {
       block: {
         bytes: newTransaction.transaction.raw_data.ref_block_bytes,
         hash: newTransaction.transaction.raw_data.ref_block_hash
+      },
+      resource: {
+        type: resourceType.toUpperCase()
       },
       signature: newTransaction.transaction.signature,
       createdAt: newTransaction.transaction.raw_data.timestamp,
@@ -100,7 +111,7 @@ export class CreateStakingTransactionUseCase {
 
 namespace CreateStakingTransactionUseCase {
   export type Params = {
-    resourceType: string;
+    resourceType: (typeof ResourceTypes)[keyof typeof ResourceTypes];
     address: string;
     amount: number;
     signingKey: string;

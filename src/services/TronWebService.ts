@@ -128,7 +128,7 @@ export class TronWebService {
 
   async buildTransactionRecord({
     contractType = ContractTypes.TRANSFER,
-    resource,
+    resourceType,
     address,
     amount,
     token
@@ -205,10 +205,15 @@ export class TronWebService {
         if (!formattedAmount)
           throw new ApplicationError(DefaultErrorMessages.UNCAUGHT_EXCEPTION);
 
+        const formattedResourceType = resourceType?.toUpperCase();
+
+        if (!formattedResourceType)
+          throw new ApplicationError('Provided an invalid resource type');
+
         const unsignedFreezeTransactionRecord =
           await this.tronWebInstance.transactionBuilder.freezeBalanceV2(
             formattedAmount,
-            resource!,
+            formattedResourceType,
             address.origin
           );
 
@@ -246,7 +251,7 @@ export class TronWebService {
 namespace TronWebService {
   export type BuildTransactionRecordParams = {
     contractType?: (typeof ContractTypes)[keyof typeof ContractTypes];
-    resource?: (typeof ResourceTypes)[keyof typeof ResourceTypes];
+    resourceType?: (typeof ResourceTypes)[keyof typeof ResourceTypes];
     address: Record<'origin' | 'recipient', string>;
     amount: number;
     token?: {

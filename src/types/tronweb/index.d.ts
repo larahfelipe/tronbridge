@@ -98,6 +98,7 @@ declare module 'tronweb' {
     type: string;
     parameter: {
       value: {
+        resource: string;
         amount: number;
         frozen_balance: number;
         owner_address: string;
@@ -115,6 +116,7 @@ declare module 'tronweb' {
       contract: Array<TransactionContract>;
       ref_block_bytes: string;
       ref_block_hash: string;
+      fee_limit: number;
       expiration: number;
       timestamp: number;
     };
