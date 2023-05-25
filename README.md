@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://github.com/larahfelipe/tronbridge/blob/master/public/tronicon.png" width="200" height="200" />
+</p>
+
 ```
 TronBridge API Documentation
 
