@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 import { Networks } from '@/config';
-import { TronWebService } from '@/services';
+import { TronGridService, TronWebService } from '@/services';
 import {
   CreateStakingTransactionUseCase,
   CreateTransferTransactionUseCase,
@@ -68,9 +68,12 @@ export const getTransactionControllerHandler = (
     : Networks.TESTNET;
 
   const tronWebService = TronWebService.getInstance(targetNetwork);
+  const tronGridService = TronGridService.getInstance(targetNetwork);
 
-  const getTransactionUseCase =
-    GetTransactionUseCase.getInstance(tronWebService);
+  const getTransactionUseCase = GetTransactionUseCase.getInstance(
+    tronWebService,
+    tronGridService
+  );
 
   const getTransactionController = GetTransactionController.getInstance(
     getTransactionUseCase

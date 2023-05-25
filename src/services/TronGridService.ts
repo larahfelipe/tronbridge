@@ -17,6 +17,21 @@ type Account = {
   latest_opration_time: number;
 };
 
+export type ContractTransaction = {
+  transaction_id: string;
+  type: string;
+  from: string;
+  to: string;
+  value: string;
+  block_timestamp: number;
+  token_info: {
+    symbol: string;
+    name: string;
+    address: string;
+    decimals: number;
+  };
+};
+
 export class TronGridService {
   private static INSTANCE: TronGridService;
   private readonly tronGridAxiosInstance: AxiosInstance;
@@ -42,14 +57,31 @@ export class TronGridService {
     return TronGridService.INSTANCE;
   }
 
-  async getAccount(base58Address: TronGridService.GetAccountParams) {
+  async getAccount(base58Address: string) {
     const { data }: AxiosResponse<Record<'data', Array<Account>>> =
       await this.tronGridAxiosInstance.get(`/accounts/${base58Address}`);
 
     return data.data[0];
   }
+
+  async getAllContractTransactionsByAddress({
+    accountAddress,
+    contractAddress
+  }: TronGridService.getAllContractTransactionsByAddressParams) {
+    let uri = `/accounts/${accountAddress}/transactions/trc20`;
+
+    if (contractAddress) uri += `?contract_address=${contractAddress}`;
+
+    const { data }: AxiosResponse<Record<'data', Array<ContractTransaction>>> =
+      await this.tronGridAxiosInstance.get(uri);
+
+    return data.data;
+  }
 }
 
 namespace TronGridService {
-  export type GetAccountParams = string;
+  export type getAllContractTransactionsByAddressParams = {
+    accountAddress: string;
+    contractAddress?: string;
+  };
 }

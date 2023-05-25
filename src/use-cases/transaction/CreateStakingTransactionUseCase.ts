@@ -28,13 +28,18 @@ export class CreateStakingTransactionUseCase {
     return CreateStakingTransactionUseCase.INSTANCE;
   }
 
-  async create(params: CreateStakingTransactionUseCase.Params) {
-    const { address, signingKey, resourceType } = params;
-
+  async create({
+    amount,
+    address,
+    resourceType,
+    signingKey
+  }: CreateStakingTransactionUseCase.Params) {
     const unsignedTransactionPayload =
       await this.tronWebService.buildTransactionRecord({
-        ...params,
+        amount,
         contractType: ContractTypes.FREEZE,
+        resourceType:
+          resourceType as (typeof ResourceTypes)[keyof typeof ResourceTypes],
         address: {
           origin: address,
           recipient: ''
@@ -72,8 +77,7 @@ export class CreateStakingTransactionUseCase {
           ),
           hex: newTransaction.transaction.raw_data.contract[0].parameter.value
             .owner_address
-        },
-        recipient: null
+        }
       },
       amount: {
         raw: parseMaybeBigNum(
@@ -111,7 +115,7 @@ export class CreateStakingTransactionUseCase {
 
 namespace CreateStakingTransactionUseCase {
   export type Params = {
-    resourceType: (typeof ResourceTypes)[keyof typeof ResourceTypes];
+    resourceType: string;
     address: string;
     amount: number;
     signingKey: string;
