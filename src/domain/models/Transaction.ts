@@ -5,7 +5,7 @@ export type Transaction = {
   isBroadcasted: boolean;
   address: {
     origin: Record<'base58' | 'hex', string>;
-    recipient: Record<'base58' | 'hex', string> | null;
+    recipient?: Record<'base58' | 'hex', string>;
   };
   amount: Record<'raw' | 'fmt', string>;
   block: {
