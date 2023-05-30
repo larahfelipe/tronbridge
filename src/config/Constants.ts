@@ -5,7 +5,8 @@ export const Networks = {
 
 export const ContractTypes = {
   TRANSFER: 'transfer_contract',
-  FREEZE: 'freeze_contract'
+  FREEZE: 'freeze_contract',
+  UNFREEZE: 'unfreeze_contract'
 } as const;
 
 export const ResourceTypes = {

@@ -1,7 +1,10 @@
 export type Account = {
   active: boolean;
   address: Record<'base58' | 'hex', string>;
-  balance: Record<'raw' | 'fmt', string>;
+  balance: {
+    available: Record<'raw' | 'fmt', string>;
+    frozen: Record<'raw' | 'fmt', string>;
+  };
   assets: Array<Record<'id' | 'balance', string>>;
   resource: {
     bandwidth: Record<'used' | 'limit', string>;

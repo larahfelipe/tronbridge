@@ -2,7 +2,7 @@ import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 
 import { Networks } from '@/config';
 import {
-  createStakingTransactionControllerHandler,
+  createStakeTransactionControllerHandler,
   createTransferTransactionControllerHandler,
   getTransactionControllerHandler
 } from '@/controllers/transaction';
@@ -27,8 +27,8 @@ export class TransactionRouter implements Router {
         createTransferTransactionControllerHandler
       );
       fastify.post(
-        `/${network}/staking`,
-        createStakingTransactionControllerHandler
+        `/${network}/stake`,
+        createStakeTransactionControllerHandler
       );
     });
 

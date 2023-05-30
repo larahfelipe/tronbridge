@@ -9,8 +9,8 @@ import { ApplicationError } from '@/errors';
 import type { TronWebService } from '@/services';
 import { parseMaybeBigNum } from '@/utils';
 
-export class CreateStakingTransactionUseCase {
-  private static INSTANCE: CreateStakingTransactionUseCase;
+export class CreateStakeTransactionUseCase {
+  private static INSTANCE: CreateStakeTransactionUseCase;
   private readonly tronWebService: TronWebService;
 
   private constructor(tronWebService: TronWebService) {
@@ -19,25 +19,27 @@ export class CreateStakingTransactionUseCase {
 
   static getInstance(tronWebService: TronWebService) {
     if (
-      !CreateStakingTransactionUseCase.INSTANCE ||
-      CreateStakingTransactionUseCase.INSTANCE.tronWebService !== tronWebService
+      !CreateStakeTransactionUseCase.INSTANCE ||
+      CreateStakeTransactionUseCase.INSTANCE.tronWebService !== tronWebService
     )
-      CreateStakingTransactionUseCase.INSTANCE =
-        new CreateStakingTransactionUseCase(tronWebService);
+      CreateStakeTransactionUseCase.INSTANCE =
+        new CreateStakeTransactionUseCase(tronWebService);
 
-    return CreateStakingTransactionUseCase.INSTANCE;
+    return CreateStakeTransactionUseCase.INSTANCE;
   }
 
   async create({
     amount,
     address,
+    contractType,
     resourceType,
     signingKey
-  }: CreateStakingTransactionUseCase.Params) {
+  }: CreateStakeTransactionUseCase.Params) {
     const unsignedTransactionPayload =
       await this.tronWebService.buildTransactionRecord({
         amount,
-        contractType: ContractTypes.FREEZE,
+        contractType:
+          contractType as (typeof ContractTypes)[keyof typeof ContractTypes],
         resourceType:
           resourceType as (typeof ResourceTypes)[keyof typeof ResourceTypes],
         address: {
@@ -64,6 +66,13 @@ export class CreateStakingTransactionUseCase {
     if (!newTransaction)
       throw new ApplicationError(TransactionMessages.BROADCAST_EXCEPTION);
 
+    const transactionAmount =
+      contractType === ContractTypes.FREEZE
+        ? newTransaction.transaction.raw_data.contract[0].parameter.value
+            .frozen_balance
+        : newTransaction.transaction.raw_data.contract[0].parameter.value
+            .unfreeze_balance;
+
     const transaction: Transaction = {
       txID: newTransaction.transaction.txID,
       type: newTransaction.transaction.raw_data.contract[0].type,
@@ -80,16 +89,11 @@ export class CreateStakingTransactionUseCase {
         }
       },
       amount: {
-        raw: parseMaybeBigNum(
-          newTransaction.transaction.raw_data.contract[0].parameter.value
-            .frozen_balance
-        ),
+        raw: parseMaybeBigNum(transactionAmount),
         fmt: parseMaybeBigNum(
-          this.tronWebService.formatAmount(
-            newTransaction.transaction.raw_data.contract[0].parameter.value
-              .frozen_balance,
-            { format: 'fromPrecision' }
-          )
+          this.tronWebService.formatAmount(transactionAmount, {
+            format: 'fromPrecision'
+          })
         )
       },
       block: {
@@ -104,7 +108,7 @@ export class CreateStakingTransactionUseCase {
       expiresAt: newTransaction.transaction.raw_data.expiration
     };
 
-    const res: CreateStakingTransactionUseCase.Result = {
+    const res: CreateStakeTransactionUseCase.Result = {
       transaction,
       message: TransactionMessages.CREATED
     };
@@ -113,11 +117,12 @@ export class CreateStakingTransactionUseCase {
   }
 }
 
-namespace CreateStakingTransactionUseCase {
+namespace CreateStakeTransactionUseCase {
   export type Params = {
-    resourceType: string;
-    address: string;
     amount: number;
+    address: string;
+    contractType: string;
+    resourceType: string;
     signingKey: string;
   };
   export type Result = {

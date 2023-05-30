@@ -51,6 +51,12 @@ export class GetAccountUseCase {
 
         if (!accountExists) return account;
 
+        const frozenBalance = accountExists.frozenV2.reduce((acc, curr) => {
+          if (!Object.keys(curr)?.length || !curr?.amount) return acc;
+
+          return (acc += curr.amount);
+        }, 0);
+
         const trc20Assets =
           accountExists.trc20?.map((item) => ({
             id: Object.keys(item)[0],
@@ -70,12 +76,22 @@ export class GetAccountUseCase {
             hex: accountExists.address
           },
           balance: {
-            raw: parseMaybeBigNum(accountExists.balance),
-            fmt: parseMaybeBigNum(
-              this.tronWebService.formatAmount(accountExists.balance, {
-                format: 'fromPrecision'
-              })
-            )
+            available: {
+              raw: parseMaybeBigNum(accountExists.balance),
+              fmt: parseMaybeBigNum(
+                this.tronWebService.formatAmount(accountExists.balance, {
+                  format: 'fromPrecision'
+                })
+              )
+            },
+            frozen: {
+              raw: parseMaybeBigNum(frozenBalance),
+              fmt: parseMaybeBigNum(
+                this.tronWebService.formatAmount(frozenBalance, {
+                  format: 'fromPrecision'
+                })
+              )
+            }
           },
           assets: [...trc20Assets, ...trc10Assets],
           resource: {
