@@ -6,6 +6,10 @@ type Account = {
   address: string;
   balance: number;
   net_usage: number;
+  frozenV2: Array<{
+    type: string;
+    amount?: number;
+  }>;
   assetV2: Array<{
     key: string;
     value: number;

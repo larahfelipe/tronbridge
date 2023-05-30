@@ -3,22 +3,22 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Networks } from '@/config';
 import { TronGridService, TronWebService } from '@/services';
 import {
-  CreateStakingTransactionUseCase,
+  CreateStakeTransactionUseCase,
   CreateTransferTransactionUseCase,
   GetTransactionUseCase
 } from '@/use-cases/transaction';
 import type {
-  CreateStakingTransactionSchemaType,
+  CreateStakeTransactionSchemaType,
   CreateTransferTransactionSchemaType,
   GetTransactionSchemaType
 } from '@/validation/schema';
 
-import { CreateStakingTransactionController } from './CreateStakingTransactionController';
+import { CreateStakeTransactionController } from './CreateStakeTransactionController';
 import { CreateTransferTransactionController } from './CreateTransferTransactionController';
 import { GetTransactionController } from './GetTransactionController';
 
-export const createStakingTransactionControllerHandler = (
-  req: FastifyRequest<{ Body: CreateStakingTransactionSchemaType }>,
+export const createStakeTransactionControllerHandler = (
+  req: FastifyRequest<{ Body: CreateStakeTransactionSchemaType }>,
   res: FastifyReply
 ) => {
   const targetNetwork = req.routerPath.includes(Networks.MAINNET)
@@ -27,15 +27,13 @@ export const createStakingTransactionControllerHandler = (
 
   const tronWebService = TronWebService.getInstance(targetNetwork);
 
-  const createStakingTransactionUseCase =
-    CreateStakingTransactionUseCase.getInstance(tronWebService);
+  const createStakeTransactionUseCase =
+    CreateStakeTransactionUseCase.getInstance(tronWebService);
 
-  const createStakingTransactionController =
-    CreateStakingTransactionController.getInstance(
-      createStakingTransactionUseCase
-    );
+  const createStakeTransactionController =
+    CreateStakeTransactionController.getInstance(createStakeTransactionUseCase);
 
-  return createStakingTransactionController.handle(req, res);
+  return createStakeTransactionController.handle(req, res);
 };
 
 export const createTransferTransactionControllerHandler = (

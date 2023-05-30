@@ -53,10 +53,11 @@ Transaction:
   *** If the token decimals is not provided/left empty (`0`), it will default to `6` (TRX decimals).
   **** If it's not a smart contract transaction, the gas limit can be ignored and leave empty (`0`).
 
-- POST /v1/transaction/mainnet/staking
+- POST /v1/transaction/mainnet/stake
   body: {
     "amount": <AMOUNT>,
     "address": <ORIGIN_ADDRESS>,
+    "contractType": <CONTRACT_TYPE>,
     "resourceType": <RESOURCE_TYPE>,
     "signingKey": <ORIGIN_PRIVATE_KEY>
   }
@@ -64,8 +65,9 @@ Transaction:
   P.S:
     1. <AMOUNT> [NUMBER] is the amount of resource that will be staked (*);
     2. <ORIGIN_ADDRESS> [STRING] is the origin address of the transaction;
-    3. <RESOURCE_TYPE> [STRING] is the type of resource that will be staked, it can be "BANDWIDTH" or "ENERGY";
-    4. <ORIGIN_PRIVATE_KEY> [STRING] is the private key of the origin address, it will be used to sign the transaction.
+    3. <CONTRACT_TYPE> [STRING] is the type of contract that will be performed, it can be "FREEZE_CONTRACT" or "UNFREEZE_CONTRACT";
+    4. <RESOURCE_TYPE> [STRING] is the type of resource that will be staked, it can be "BANDWIDTH" or "ENERGY";
+    5. <ORIGIN_PRIVATE_KEY> [STRING] is the private key of the origin address, it will be used to sign the transaction.
 
   * The amount should be provided without multiplying by decimals, use the actual amount as it is.
 

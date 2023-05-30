@@ -14,6 +14,7 @@ import {
   type ResourceTypes
 } from '@/config';
 import { ApplicationError } from '@/errors';
+import { parseMaybeBigNum } from '@/utils';
 
 export class TronWebService {
   private static INSTANCE: TronWebService;
@@ -60,23 +61,25 @@ export class TronWebService {
       decimals?: number;
     } = {}
   ) {
-    if (rawAmount <= 0)
-      throw new ApplicationError('Formatting an invalid amount');
+    if (rawAmount < 0)
+      throw new ApplicationError('Formatting a negative amount');
+
+    if (rawAmount === 0) return rawAmount;
 
     let { format, decimals } = options;
 
     if (!format) format = 'toPrecision';
     if (!decimals || decimals <= 0) decimals = TRX.DECIMALS;
 
-    let amount: number | undefined;
+    let amount: string | number | undefined;
 
     switch (format) {
       case 'toPrecision':
-        amount = rawAmount * 10 ** decimals;
+        amount = parseMaybeBigNum(rawAmount * 10 ** decimals);
         break;
 
       case 'fromPrecision':
-        amount = rawAmount / 10 ** decimals;
+        amount = parseMaybeBigNum(rawAmount / 10 ** decimals);
         break;
 
       default:
@@ -162,7 +165,9 @@ export class TronWebService {
           const contractTransactionOptions: SmartContractTransactionOptions = {
             callValue: 0, // The amount of TRX transferred with this transaction
             feeLimit:
-              token?.gasLimit > 0 ? this.formatAmount(token.gasLimit) : 50000000 // Max fee willing to pay for this tx (50 TRX by default)
+              token?.gasLimit > 0
+                ? +this.formatAmount(token.gasLimit)
+                : 50000000 // Max fee willing to pay for this tx (50 TRX by default)
           };
 
           const contractTransferFunctionParams: Array<SmartContractTransactionFunctionSelectorParams> =
@@ -218,6 +223,27 @@ export class TronWebService {
           );
 
         return unsignedFreezeTransactionRecord;
+      }
+
+      case ContractTypes.UNFREEZE: {
+        const formattedAmount = this.formatAmount(amount);
+
+        if (!formattedAmount)
+          throw new ApplicationError(DefaultErrorMessages.UNCAUGHT_EXCEPTION);
+
+        const formattedResourceType = resourceType?.toUpperCase();
+
+        if (!formattedResourceType)
+          throw new ApplicationError('Provided an invalid resource type');
+
+        const unsignedUnfreezeTransactionRecord =
+          await this.tronWebInstance.transactionBuilder.unfreezeBalanceV2(
+            formattedAmount,
+            formattedResourceType,
+            address.origin
+          );
+
+        return unsignedUnfreezeTransactionRecord;
       }
 
       default:

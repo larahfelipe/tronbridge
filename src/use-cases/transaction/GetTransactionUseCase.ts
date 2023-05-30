@@ -81,6 +81,7 @@ export class GetTransactionUseCase {
     const amount =
       transactionExists.raw_data.contract[0].parameter.value.amount ??
       transactionExists.raw_data.contract[0].parameter.value.frozen_balance ??
+      transactionExists.raw_data.contract[0].parameter.value.unfreeze_balance ??
       smartContractTransactionInfoExists.value;
 
     const transaction: Transaction = {

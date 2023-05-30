@@ -101,6 +101,7 @@ declare module 'tronweb' {
         resource: string;
         amount: number;
         frozen_balance: number;
+        unfreeze_balance: number;
         owner_address: string;
         to_address: string;
         contract_address: string;
@@ -157,7 +158,12 @@ declare module 'tronweb' {
 
   export type TransactionBuilderModule = {
     freezeBalanceV2: (
-      amount: number,
+      amount: string | number,
+      resource: string,
+      address: string
+    ) => Promise<Maybe<UnsignedTransaction>>;
+    unfreezeBalanceV2: (
+      amount: string | number,
       resource: string,
       address: string
     ) => Promise<Maybe<UnsignedTransaction>>;
@@ -170,13 +176,13 @@ declare module 'tronweb' {
     ) => Promise<Maybe<Record<'transaction', UnsignedTransaction>>>;
     sendTrx: (
       to: string,
-      amount: number,
+      amount: string | number,
       from: string,
       options?: number
     ) => Promise<Maybe<UnsignedTransaction>>;
     sendAsset: (
       to: string,
-      amount: number,
+      amount: string | number,
       tokenID: string,
       from: string,
       options?: number
