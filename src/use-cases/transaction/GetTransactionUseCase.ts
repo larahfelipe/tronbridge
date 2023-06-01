@@ -108,7 +108,10 @@ export class GetTransactionUseCase {
         raw: parseMaybeBigNum(amount),
         fmt: parseMaybeBigNum(
           this.tronWebService.formatAmount(amount, {
-            format: 'fromPrecision'
+            format: 'fromPrecision',
+            decimals:
+              smartContractTransactionInfoExists.token_info.decimals ??
+              TRX.DECIMALS
           })
         )
       },

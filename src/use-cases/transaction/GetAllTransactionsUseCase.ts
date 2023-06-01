@@ -1,5 +1,6 @@
-import { TRX } from '@/config';
+import { TRX, TransactionMessages } from '@/config';
 import type { Transaction } from '@/domain/models';
+import { NotFoundError } from '@/errors';
 import type {
   ContractTransaction,
   TronGridService,
@@ -71,7 +72,8 @@ export class GetAllTransactionsUseCase {
                 ({ transaction_id }) => transaction_id === transaction.txID
               ) as ContractTransaction;
 
-            if (!smartContractTransactionInfoExists) return {} as Transaction;
+            if (!smartContractTransactionInfoExists)
+              throw new NotFoundError(TransactionMessages.NOT_FOUND);
           }
 
           const recipientAddress =
@@ -107,7 +109,10 @@ export class GetAllTransactionsUseCase {
               raw: parseMaybeBigNum(amount),
               fmt: parseMaybeBigNum(
                 this.tronWebService.formatAmount(amount, {
-                  format: 'fromPrecision'
+                  format: 'fromPrecision',
+                  decimals:
+                    smartContractTransactionInfoExists.token_info.decimals ??
+                    TRX.DECIMALS
                 })
               )
             },
