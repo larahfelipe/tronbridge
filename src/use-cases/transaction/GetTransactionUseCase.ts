@@ -90,7 +90,7 @@ export class GetTransactionUseCase {
       type: transactionExists.raw_data.contract[0].type,
       isBroadcasted:
         transactionExists.ret[0].contractRet === 'SUCCESS' ||
-        transactionInfoExists?.receipt.result === 'SUCCESS',
+        transactionInfoExists?.receipt?.result === 'SUCCESS',
       assetID: maybeSmartContractAddress ?? TRX.SYMBOL,
       address: {
         origin: {
@@ -110,7 +110,7 @@ export class GetTransactionUseCase {
           this.tronWebService.formatAmount(amount, {
             format: 'fromPrecision',
             decimals:
-              smartContractTransactionInfoExists.token_info.decimals ??
+              smartContractTransactionInfoExists?.token_info?.decimals ??
               TRX.DECIMALS
           })
         )

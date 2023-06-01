@@ -78,6 +78,7 @@ declare module 'tronweb' {
     name: string;
     origin_address: string;
     contract_address: string;
+    origin_energy_limit: number;
     abi: Record<'entrys', unknown>;
   };
 
@@ -157,6 +158,9 @@ declare module 'tronweb' {
 
   export type Transaction = UnsignedTransaction & Record<'signature', [string]>;
 
+  export type BroadcastedTransaction = Transaction &
+    Record<'ret', Array<Record<'contractRet', string>>>;
+
   export type TransactionBuilderModule = {
     freezeBalanceV2: (
       amount: string | number,
@@ -195,11 +199,7 @@ declare module 'tronweb' {
     getTokenIssuedByAddress: (tokenAddress: string) => Promise<Maybe<Token>>;
     getAccountResources: (address: string) => Promise<Maybe<AccountResources>>;
     getContract: (contractAddress: string) => Promise<Maybe<Contract>>;
-    getTransaction: (
-      txId: string
-    ) => Promise<
-      Maybe<Transaction & Record<'ret', Array<Record<'contractRet', string>>>>
-    >;
+    getTransaction: (txId: string) => Promise<Maybe<BroadcastedTransaction>>;
     getTransactionInfo: (txId: string) => Promise<Maybe<TransactionInfo>>;
     sign: (
       unsignedTransaction: UnsignedTransaction,
@@ -215,13 +215,19 @@ declare module 'tronweb' {
     toHex: (base58Value: string) => string;
   };
 
+  export type ContractModule = {
+    at: (contractAddress: string) => Promise<Maybe<any>>;
+  };
+
   export default class TronWeb {
     constructor(config: Config);
     createAccount: () => Promise<Maybe<GeneratedAccount>>;
     createRandom: () => Promise<Maybe<GeneratedAccountWithMnemonic>>;
     fromMnemonic: () => Promise<Maybe<GeneratedAccountWithMnemonic>>;
     toUtf8: (hexValue: string) => string;
+    setAddress: (address: string) => void;
     transactionBuilder: TransactionBuilderModule;
+    contract: () => ContractModule;
     trx: TrxModule;
     address: AddressModule;
   }
