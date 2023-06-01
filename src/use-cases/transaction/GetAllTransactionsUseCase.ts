@@ -89,7 +89,9 @@ export class GetAllTransactionsUseCase {
           return {
             txID: transaction.txID,
             type: transaction.raw_data.contract[0].type,
-            isBroadcasted: true,
+            isBroadcasted:
+              transaction.ret[0].contractRet === 'SUCCESS' ||
+              transactionInfoExists?.receipt?.result === 'SUCCESS',
             assetID:
               this.tronWebService.hexToBase58(maybeSmartContractAddress) ??
               TRX.SYMBOL,
@@ -111,7 +113,7 @@ export class GetAllTransactionsUseCase {
                 this.tronWebService.formatAmount(amount, {
                   format: 'fromPrecision',
                   decimals:
-                    smartContractTransactionInfoExists.token_info.decimals ??
+                    smartContractTransactionInfoExists?.token_info?.decimals ??
                     TRX.DECIMALS
                 })
               )

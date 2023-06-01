@@ -54,7 +54,7 @@ export class GetAccountUseCase {
         const frozenBalance = accountExists.frozenV2.reduce((acc, curr) => {
           if (!Object.keys(curr)?.length || !curr?.amount) return acc;
 
-          return (acc += curr.amount);
+          return acc + curr.amount;
         }, 0);
 
         const trc20Assets =

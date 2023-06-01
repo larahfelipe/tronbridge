@@ -115,6 +115,29 @@ export class TronWebService {
     return contract;
   }
 
+  async callContract({
+    contractAddress,
+    functionSelector,
+    functionSelectorParams = []
+  }: TronWebService.CallContractParams) {
+    this.tronWebInstance.setAddress(contractAddress);
+    const contract = await this.tronWebInstance.contract().at(contractAddress);
+
+    let result: any = contract;
+
+    if (functionSelector) {
+      if (functionSelectorParams.length) {
+        const functionParams = functionSelectorParams.join(',');
+
+        result = await contract[functionSelector](functionParams).call();
+      } else {
+        result = await contract[functionSelector]().call();
+      }
+    }
+
+    return result;
+  }
+
   async getTransactionById(txId: string) {
     const transaction = await this.tronWebInstance.trx.getTransaction(txId);
 
@@ -275,6 +298,11 @@ export class TronWebService {
 }
 
 namespace TronWebService {
+  export type CallContractParams = {
+    contractAddress: string;
+    functionSelector?: string;
+    functionSelectorParams?: Array<unknown>;
+  };
   export type BuildTransactionRecordParams = {
     contractType?: (typeof ContractTypes)[keyof typeof ContractTypes];
     resourceType?: (typeof ResourceTypes)[keyof typeof ResourceTypes];

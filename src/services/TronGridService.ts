@@ -1,5 +1,5 @@
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
-import type { Transaction } from 'tronweb';
+import type { BroadcastedTransaction } from 'tronweb';
 
 import { Networks } from '@/config';
 
@@ -73,7 +73,9 @@ export class TronGridService {
     accountAddress,
     limit = 5
   }: TronGridService.GetAllTransactionsByAddressParams) {
-    const { data }: AxiosResponse<Record<'data', Array<Transaction>>> =
+    const {
+      data
+    }: AxiosResponse<Record<'data', Array<BroadcastedTransaction>>> =
       await this.tronGridAxiosInstance.get(
         `/accounts/${accountAddress}/transactions?only_confirmed=true&limit=${limit}`
       );
