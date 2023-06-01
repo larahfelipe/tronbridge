@@ -113,6 +113,7 @@ declare module 'tronweb' {
   export type UnsignedTransaction = {
     txID: string;
     visible: boolean;
+    block_timestamp: number;
     raw_data: {
       contract: Array<TransactionContract>;
       ref_block_bytes: string;

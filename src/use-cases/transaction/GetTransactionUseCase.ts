@@ -63,7 +63,8 @@ export class GetTransactionUseCase {
       const accountContractTransactions =
         await this.tronGridService.getAllContractTransactionsByAddress({
           contractAddress: maybeSmartContractAddress,
-          accountAddress: originAddress
+          accountAddress: originAddress,
+          limit: 20
         });
 
       smartContractTransactionInfoExists = accountContractTransactions.find(

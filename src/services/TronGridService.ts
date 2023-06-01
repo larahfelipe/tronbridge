@@ -1,4 +1,5 @@
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
+import type { Transaction } from 'tronweb';
 
 import { Networks } from '@/config';
 
@@ -68,13 +69,26 @@ export class TronGridService {
     return data.data[0];
   }
 
+  async getAllTransactionsByAddress({
+    accountAddress,
+    limit = 5
+  }: TronGridService.GetAllTransactionsByAddressParams) {
+    const { data }: AxiosResponse<Record<'data', Array<Transaction>>> =
+      await this.tronGridAxiosInstance.get(
+        `/accounts/${accountAddress}/transactions?only_confirmed=true&limit=${limit}`
+      );
+
+    return data.data;
+  }
+
   async getAllContractTransactionsByAddress({
     accountAddress,
-    contractAddress
-  }: TronGridService.getAllContractTransactionsByAddressParams) {
-    let uri = `/accounts/${accountAddress}/transactions/trc20`;
+    contractAddress,
+    limit = 5
+  }: TronGridService.GetAllContractTransactionsByAddressParams) {
+    let uri = `/accounts/${accountAddress}/transactions/trc20?only_confirmed=true&limit=${limit}`;
 
-    if (contractAddress) uri += `?contract_address=${contractAddress}`;
+    if (contractAddress) uri += `&contract_address=${contractAddress}`;
 
     const { data }: AxiosResponse<Record<'data', Array<ContractTransaction>>> =
       await this.tronGridAxiosInstance.get(uri);
@@ -84,8 +98,13 @@ export class TronGridService {
 }
 
 namespace TronGridService {
-  export type getAllContractTransactionsByAddressParams = {
+  export type GetAllTransactionsByAddressParams = {
+    accountAddress: string;
+    limit?: number;
+  };
+  export type GetAllContractTransactionsByAddressParams = {
     accountAddress: string;
     contractAddress?: string;
+    limit?: number;
   };
 }
