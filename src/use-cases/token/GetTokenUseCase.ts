@@ -49,18 +49,16 @@ export class GetTokenUseCase {
 
         if (!tokenExists) return token;
 
-        const tokenSmartContractExists = await this.tronWebService.callContract(
-          {
-            contractAddress: tokenId
-          }
-        );
+        const smartContractExists = await this.tronWebService.callContract({
+          contractAddress: tokenId
+        });
 
-        if (!tokenSmartContractExists) return token;
+        if (!smartContractExists) return token;
 
         const [tokenName, tokenSymbol, tokenDecimals] = (await Promise.all([
-          tokenSmartContractExists.name().call(),
-          tokenSmartContractExists.symbol().call(),
-          tokenSmartContractExists.decimals().call()
+          smartContractExists.name().call(),
+          smartContractExists.symbol().call(),
+          smartContractExists.decimals().call()
         ])) as [string, string, number];
 
         token = {
@@ -74,10 +72,10 @@ export class GetTokenUseCase {
             creator: this.tronWebService.hexToBase58(tokenExists.origin_address)
           },
           decimals: tokenDecimals,
-          ...(!!include_bytecode && {
+          ...(include_bytecode && {
             byteCode: tokenExists.bytecode
           }),
-          ...(!!include_abi && {
+          ...(include_abi && {
             abi: tokenExists.abi
           })
         };
@@ -97,8 +95,8 @@ export class GetTokenUseCase {
 namespace GetTokenUseCase {
   export type Params = {
     id: string;
-    include_abi?: unknown;
-    include_bytecode?: unknown;
+    include_abi?: any;
+    include_bytecode?: any;
   };
   export type Result = Record<'tokens', Array<Token>>;
 }

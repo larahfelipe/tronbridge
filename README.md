@@ -25,6 +25,14 @@ Account:
 
 --
 
+Token:
+- GET /v1/token/mainnet?id=<TOKEN_ID>
+
+  Caption:
+    1. <TOKEN_ID> [STRING] is the token id (address) that will be used to retrieve the token information (*).
+
+--
+
 Transaction:
 - GET /v1/transaction/mainnet?id=<TRANSACTION_ID>
 

@@ -5,9 +5,11 @@ export const GetTokenSchema = z.object({
     .string()
     .nonempty('Token ID is required')
     .transform((value) => value.trim()),
-  include_abi: z.preprocess((value) => Boolean(value), z.boolean()).optional(),
+  include_abi: z
+    .preprocess((value) => value === 'true', z.boolean())
+    .optional(),
   include_bytecode: z
-    .preprocess((value) => Boolean(value), z.boolean())
+    .preprocess((value) => value === 'true', z.boolean())
     .optional()
 });
 
