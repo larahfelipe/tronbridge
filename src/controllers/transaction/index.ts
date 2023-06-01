@@ -68,12 +68,12 @@ export const getAllTransactionsControllerHandler = (
     ? Networks.MAINNET
     : Networks.TESTNET;
 
-  const tronWebService = TronWebService.getInstance(targetNetwork);
   const tronGridService = TronGridService.getInstance(targetNetwork);
+  const tronWebService = TronWebService.getInstance(targetNetwork);
 
   const getAllTransactionsUseCase = GetAllTransactionsUseCase.getInstance(
-    tronWebService,
-    tronGridService
+    tronGridService,
+    tronWebService
   );
 
   const getAllTransactionsController = GetAllTransactionsController.getInstance(

@@ -10,20 +10,20 @@ import { parseMaybeBigNum } from '@/utils';
 
 export class GetAllTransactionsUseCase {
   private static INSTANCE: GetAllTransactionsUseCase;
-  private readonly tronWebService: TronWebService;
   private readonly tronGridService: TronGridService;
+  private readonly tronWebService: TronWebService;
 
   private constructor(
-    tronWebService: TronWebService,
-    tronGridService: TronGridService
+    tronGridService: TronGridService,
+    tronWebService: TronWebService
   ) {
-    this.tronWebService = tronWebService;
     this.tronGridService = tronGridService;
+    this.tronWebService = tronWebService;
   }
 
   static getInstance(
-    tronWebService: TronWebService,
-    tronGridService: TronGridService
+    tronGridService: TronGridService,
+    tronWebService: TronWebService
   ) {
     if (
       !GetAllTransactionsUseCase.INSTANCE ||
@@ -31,8 +31,8 @@ export class GetAllTransactionsUseCase {
       GetAllTransactionsUseCase.INSTANCE.tronGridService !== tronGridService
     )
       GetAllTransactionsUseCase.INSTANCE = new GetAllTransactionsUseCase(
-        tronWebService,
-        tronGridService
+        tronGridService,
+        tronWebService
       );
 
     return GetAllTransactionsUseCase.INSTANCE;
