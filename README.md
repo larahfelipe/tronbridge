@@ -26,10 +26,16 @@ Account:
 --
 
 Token:
-- GET /v1/token/mainnet?id=<TOKEN_ID>
+- GET /v1/token/mainnet?id=<TOKEN_ID>&include_abi=<INCLUDE_ABI>&include_bytecode=<INCLUDE_BYTECODE>
 
   Caption:
-    1. <TOKEN_ID> [STRING] is the token id (address) that will be used to retrieve the token information (*).
+    1. <TOKEN_ID> [STRING] is the token id (address) that will be used to retrieve the token information (*);
+    2. <INCLUDE_ABI> [BOOLEAN] is a flag that will be used to include the ABI in the response (**);
+    3. <INCLUDE_BYTECODE> [BOOLEAN] is a flag that will be used to include the bytecode in the response (***).
+
+    * Token id parameter supports multiple token ids separated by comma.
+    ** If the abi parameter is not provided, it will default to `false`.
+    *** If the bytecode parameter is not provided, it will default to `false`.
 
 --
 
