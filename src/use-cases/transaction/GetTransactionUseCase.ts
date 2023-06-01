@@ -63,7 +63,8 @@ export class GetTransactionUseCase {
       const accountContractTransactions =
         await this.tronGridService.getAllContractTransactionsByAddress({
           contractAddress: maybeSmartContractAddress,
-          accountAddress: originAddress
+          accountAddress: originAddress,
+          limit: 20
         });
 
       smartContractTransactionInfoExists = accountContractTransactions.find(
@@ -107,7 +108,10 @@ export class GetTransactionUseCase {
         raw: parseMaybeBigNum(amount),
         fmt: parseMaybeBigNum(
           this.tronWebService.formatAmount(amount, {
-            format: 'fromPrecision'
+            format: 'fromPrecision',
+            decimals:
+              smartContractTransactionInfoExists.token_info.decimals ??
+              TRX.DECIMALS
           })
         )
       },

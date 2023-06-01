@@ -4,6 +4,7 @@ import { Networks } from '@/config';
 import {
   createStakeTransactionControllerHandler,
   createTransferTransactionControllerHandler,
+  getAllTransactionsControllerHandler,
   getTransactionControllerHandler
 } from '@/controllers/transaction';
 import type { Router } from '@/interfaces';
@@ -22,6 +23,7 @@ export class TransactionRouter implements Router {
   ) {
     Object.values(Networks).forEach((network) => {
       fastify.get(`/${network}`, getTransactionControllerHandler);
+      fastify.get(`/${network}/all`, getAllTransactionsControllerHandler);
       fastify.post(
         `/${network}/transfer`,
         createTransferTransactionControllerHandler

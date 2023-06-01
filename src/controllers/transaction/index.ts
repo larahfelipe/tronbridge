@@ -5,16 +5,19 @@ import { TronGridService, TronWebService } from '@/services';
 import {
   CreateStakeTransactionUseCase,
   CreateTransferTransactionUseCase,
+  GetAllTransactionsUseCase,
   GetTransactionUseCase
 } from '@/use-cases/transaction';
 import type {
   CreateStakeTransactionSchemaType,
   CreateTransferTransactionSchemaType,
+  GetAllTransactionsSchemaType,
   GetTransactionSchemaType
 } from '@/validation/schema';
 
 import { CreateStakeTransactionController } from './CreateStakeTransactionController';
 import { CreateTransferTransactionController } from './CreateTransferTransactionController';
+import { GetAllTransactionsController } from './GetAllTransactionsController';
 import { GetTransactionController } from './GetTransactionController';
 
 export const createStakeTransactionControllerHandler = (
@@ -55,6 +58,29 @@ export const createTransferTransactionControllerHandler = (
     );
 
   return createTransferTransactionController.handle(req, res);
+};
+
+export const getAllTransactionsControllerHandler = (
+  req: FastifyRequest<{ Querystring: GetAllTransactionsSchemaType }>,
+  res: FastifyReply
+) => {
+  const targetNetwork = req.routerPath.includes(Networks.MAINNET)
+    ? Networks.MAINNET
+    : Networks.TESTNET;
+
+  const tronWebService = TronWebService.getInstance(targetNetwork);
+  const tronGridService = TronGridService.getInstance(targetNetwork);
+
+  const getAllTransactionsUseCase = GetAllTransactionsUseCase.getInstance(
+    tronWebService,
+    tronGridService
+  );
+
+  const getAllTransactionsController = GetAllTransactionsController.getInstance(
+    getAllTransactionsUseCase
+  );
+
+  return getAllTransactionsController.handle(req, res);
 };
 
 export const getTransactionControllerHandler = (
