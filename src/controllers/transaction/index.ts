@@ -26,7 +26,7 @@ export const createStakeTransactionControllerHandler = (
 ) => {
   const targetNetwork = req.routerPath.includes(Networks.MAINNET)
     ? Networks.MAINNET
-    : Networks.TESTNET;
+    : Networks.SHASTA;
 
   const tronWebService = TronWebService.getInstance(targetNetwork);
 
@@ -45,7 +45,7 @@ export const createTransferTransactionControllerHandler = (
 ) => {
   const targetNetwork = req.routerPath.includes(Networks.MAINNET)
     ? Networks.MAINNET
-    : Networks.TESTNET;
+    : Networks.SHASTA;
 
   const tronWebService = TronWebService.getInstance(targetNetwork);
 
@@ -66,7 +66,7 @@ export const getAllTransactionsControllerHandler = (
 ) => {
   const targetNetwork = req.routerPath.includes(Networks.MAINNET)
     ? Networks.MAINNET
-    : Networks.TESTNET;
+    : Networks.SHASTA;
 
   const tronGridService = TronGridService.getInstance(targetNetwork);
   const tronWebService = TronWebService.getInstance(targetNetwork);
@@ -89,7 +89,7 @@ export const getTransactionControllerHandler = (
 ) => {
   const targetNetwork = req.routerPath.includes(Networks.MAINNET)
     ? Networks.MAINNET
-    : Networks.TESTNET;
+    : Networks.SHASTA;
 
   const tronWebService = TronWebService.getInstance(targetNetwork);
   const tronGridService = TronGridService.getInstance(targetNetwork);
