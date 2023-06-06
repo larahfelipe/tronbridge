@@ -14,7 +14,7 @@ export const createAccountControllerHandler = (
 ) => {
   const targetNetwork = req.routerPath.includes(Networks.MAINNET)
     ? Networks.MAINNET
-    : Networks.TESTNET;
+    : Networks.SHASTA;
 
   const tronWebService = TronWebService.getInstance(targetNetwork);
 
@@ -32,7 +32,7 @@ export const getAccountControllerHandler = (
 ) => {
   const targetNetwork = req.routerPath.includes(Networks.MAINNET)
     ? Networks.MAINNET
-    : Networks.TESTNET;
+    : Networks.SHASTA;
 
   const tronGridService = TronGridService.getInstance(targetNetwork);
   const tronWebService = TronWebService.getInstance(targetNetwork);

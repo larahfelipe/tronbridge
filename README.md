@@ -6,8 +6,8 @@
 TronBridge API Documentation
 
 Available networks:
-- Mainnet (https://api.trongrid.io)
-- Shasta Testnet (https://api.shasta.trongrid.io)
+- Mainnet [mainnet] (https://api.trongrid.io)
+- Shasta Testnet [shasta] (https://api.shasta.trongrid.io)
 
 ==
 
@@ -51,7 +51,7 @@ Transaction:
     1. <ADDRESS> [STRING] is the account address that will be used to filter the transactions;
     2. <LIMIT> [NUMBER] is the maximum number of transactions that will be returned (*).
 
-    * Limit parameter is optional, if it's not provided, it will default to 5.
+    * Limit parameter is optional, if it's not provided, it will default to `5`.
 
 - POST /v1/transaction/mainnet/transfer
   body: {

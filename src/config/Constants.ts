@@ -1,6 +1,6 @@
 export const Networks = {
   MAINNET: 'mainnet',
-  TESTNET: 'testnet'
+  SHASTA: 'shasta'
 } as const;
 
 export const ContractTypes = {
