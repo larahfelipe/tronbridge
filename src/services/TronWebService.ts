@@ -107,6 +107,18 @@ export class TronWebService {
     return account;
   }
 
+  async createAccountWithMnemonics() {
+    const account = await this.tronWebInstance.createRandom();
+
+    return account;
+  }
+
+  async getAccountFromMnemonics(mnemonicPhrase: string) {
+    const account = await this.tronWebInstance.fromMnemonic(mnemonicPhrase);
+
+    return account;
+  }
+
   async getContractByAddress(contractAddress: string) {
     const contract = await this.tronWebInstance.trx.getContract(
       contractAddress

@@ -21,7 +21,12 @@ Account:
 
     * Address parameter supports multiple addresses separated by comma.
 
-- POST /v1/account/mainnet
+- POST /v1/account/mainnet?with_mnemonics=<WITH_MNEMONICS>
+
+  Caption:
+    1. <WITH_MNEMONICS> [BOOLEAN] is a flag that will be used to include the mnemonics of the account (*).
+
+    * If the with mnemonics parameter is not provided, it will default to `false`.
 
 --
 

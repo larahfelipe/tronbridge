@@ -3,13 +3,16 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import { Networks } from '@/config';
 import { TronGridService, TronWebService } from '@/services';
 import { CreateAccountUseCase, GetAccountUseCase } from '@/use-cases/account';
-import type { GetAccountSchemaType } from '@/validation/schema';
+import type {
+  CreateAccountSchemaType,
+  GetAccountSchemaType
+} from '@/validation/schema';
 
 import { CreateAccountController } from './CreateAccountController';
 import { GetAccountController } from './GetAccountController';
 
 export const createAccountControllerHandler = (
-  req: FastifyRequest,
+  req: FastifyRequest<{ Querystring: CreateAccountSchemaType }>,
   res: FastifyReply
 ) => {
   const targetNetwork = req.routerPath.includes(Networks.MAINNET)

@@ -95,8 +95,8 @@ export class GetTokenUseCase {
 namespace GetTokenUseCase {
   export type Params = {
     id: string;
-    include_abi?: any;
-    include_bytecode?: any;
+    include_abi?: boolean;
+    include_bytecode?: boolean;
   };
   export type Result = Record<'tokens', Array<Token>>;
 }

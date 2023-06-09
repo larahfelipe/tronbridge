@@ -6,11 +6,13 @@ export const GetTokenSchema = z.object({
     .nonempty('Token ID is required')
     .transform((value) => value.trim()),
   include_abi: z
-    .preprocess((value) => value === 'true', z.boolean())
-    .optional(),
+    .string()
+    .transform((value) => value === 'true')
+    .optional() as unknown as z.ZodOptional<z.ZodBoolean>,
   include_bytecode: z
-    .preprocess((value) => value === 'true', z.boolean())
-    .optional()
+    .string()
+    .transform((value) => value === 'true')
+    .optional() as unknown as z.ZodOptional<z.ZodBoolean>
 });
 
 export type GetTokenSchemaType = z.infer<typeof GetTokenSchema>;
