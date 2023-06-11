@@ -27,6 +27,7 @@ export const DefaultErrorMessages = {
 };
 
 export const AccountMessages = {
+  NOT_FOUND: 'Account not found in the blockchain',
   CREATED: 'Account created successfully',
   CREATION_EXCEPTION:
     'Something went wrong while generating a new account. Try again later'

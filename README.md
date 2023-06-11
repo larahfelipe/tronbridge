@@ -21,12 +21,22 @@ Account:
 
     * Address parameter supports multiple addresses separated by comma.
 
-- POST /v1/account/mainnet?with_mnemonics=<WITH_MNEMONICS>
+- POST /v1/account/mainnet/create?with_mnemonics=<WITH_MNEMONICS>
 
   Caption:
     1. <WITH_MNEMONICS> [BOOLEAN] is a flag that will be used to include the mnemonics of the account (*).
 
     * If the with mnemonics parameter is not provided, it will default to `false`.
+
+- POST /v1/account/mainnet/recover
+  body: {
+    "mnemonics": <MNEMONICS>
+  }
+
+  Caption:
+    1. <MNEMONICS> [ARRAY] is the mnemonics that will be used to recover the account (*)
+
+    * Mnemonics parameter must have at least 12 words and at most 24 words.
 
 --
 
