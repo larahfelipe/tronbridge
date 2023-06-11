@@ -3,7 +3,8 @@ import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { Networks } from '@/config';
 import {
   createAccountControllerHandler,
-  getAccountControllerHandler
+  getAccountControllerHandler,
+  recoverAccountFromMnemonicsControllerHandler
 } from '@/controllers/account';
 import type { Router } from '@/interfaces';
 
@@ -21,7 +22,11 @@ export class AccountRouter implements Router {
   ) {
     Object.values(Networks).forEach((network) => {
       fastify.get(`/${network}`, getAccountControllerHandler);
-      fastify.post(`/${network}`, createAccountControllerHandler);
+      fastify.post(`/${network}/create`, createAccountControllerHandler);
+      fastify.post(
+        `/${network}/recover`,
+        recoverAccountFromMnemonicsControllerHandler
+      );
     });
 
     done();

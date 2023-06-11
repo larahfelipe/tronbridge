@@ -1,6 +1,5 @@
-import type { GeneratedAccount } from 'tronweb';
-
 import { AccountMessages } from '@/config';
+import type { GeneratedAccount } from '@/domain/models';
 import { ApplicationError } from '@/errors';
 import type { TronWebService } from '@/services';
 
@@ -22,14 +21,37 @@ export class CreateAccountUseCase {
     return CreateAccountUseCase.INSTANCE;
   }
 
-  async create() {
-    const newAccount = await this.tronWebService.createAccount();
+  async create({ with_mnemonics }: CreateAccountUseCase.Params) {
+    const newAccount = with_mnemonics
+      ? await this.tronWebService.createAccountWithMnemonics()
+      : await this.tronWebService.createAccount();
 
     if (!newAccount?.privateKey?.length)
       throw new ApplicationError(AccountMessages.CREATION_EXCEPTION);
 
+    const account: GeneratedAccount = {
+      ...(newAccount as GeneratedAccount),
+      ...(with_mnemonics
+        ? {
+            privateKey: newAccount.privateKey.slice(2).toUpperCase(),
+            publicKey: newAccount.publicKey.slice(2).toUpperCase(),
+            address: {
+              base58: newAccount.address as string,
+              hex: this.tronWebService.base58ToHex(newAccount.address as string)
+            }
+          }
+        : {
+            privateKey: newAccount.privateKey,
+            publicKey: newAccount.publicKey,
+            address: {
+              base58: (newAccount.address as Record<'base58', string>).base58,
+              hex: (newAccount.address as Record<'hex', string>).hex
+            }
+          })
+    };
+
     const res: CreateAccountUseCase.Result = {
-      account: newAccount,
+      account,
       message: AccountMessages.CREATED
     };
 
@@ -38,6 +60,9 @@ export class CreateAccountUseCase {
 }
 
 namespace CreateAccountUseCase {
+  export type Params = {
+    with_mnemonics?: boolean;
+  };
   export type Result = {
     account: GeneratedAccount;
     message: string;

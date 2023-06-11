@@ -4,6 +4,11 @@ import { DefaultErrorMessages } from '@/config';
 import type { ApplicationError } from '@/errors';
 import type { Controller } from '@/interfaces';
 import type { CreateAccountUseCase } from '@/use-cases/account';
+import { validate } from '@/validation';
+import {
+  CreateAccountSchema,
+  type CreateAccountSchemaType
+} from '@/validation/schema';
 
 export class CreateAccountController implements Controller {
   private static INSTANCE: CreateAccountController;
@@ -27,11 +32,13 @@ export class CreateAccountController implements Controller {
   }
 
   async handle(
-    _: CreateAccountController.Request,
+    req: CreateAccountController.Request,
     res: CreateAccountController.Response
   ) {
     try {
-      const result = await this.createAccountUseCase.create();
+      const params = await validate(CreateAccountSchema, req.query);
+
+      const result = await this.createAccountUseCase.create(params);
 
       return res.status(201).send(result);
     } catch (e) {
@@ -47,6 +54,8 @@ export class CreateAccountController implements Controller {
 }
 
 namespace CreateAccountController {
-  export type Request = FastifyRequest;
+  export type Request = FastifyRequest<{
+    Querystring: CreateAccountSchemaType;
+  }>;
   export type Response = FastifyReply;
 }

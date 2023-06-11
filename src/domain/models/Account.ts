@@ -13,3 +13,10 @@ export type Account = {
   createdAt: number;
   lastSeenAt: number;
 };
+
+export type GeneratedAccount = {
+  mnemonic: Record<'phrase' | 'path' | 'locale', string>;
+  publicKey: string;
+  privateKey: string;
+  address: Record<'base58' | 'hex', string>;
+};

@@ -223,7 +223,9 @@ declare module 'tronweb' {
     constructor(config: Config);
     createAccount: () => Promise<Maybe<GeneratedAccount>>;
     createRandom: () => Promise<Maybe<GeneratedAccountWithMnemonic>>;
-    fromMnemonic: () => Promise<Maybe<GeneratedAccountWithMnemonic>>;
+    fromMnemonic: (
+      mnemonic: string
+    ) => Promise<Maybe<GeneratedAccountWithMnemonic>>;
     toUtf8: (hexValue: string) => string;
     setAddress: (address: string) => void;
     transactionBuilder: TransactionBuilderModule;
