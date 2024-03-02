@@ -7,13 +7,10 @@ import (
 )
 
 func main() {
-	a, err := account.Create(256, "")
+	acc, err := account.New(256, "")
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(a.Key.Path)
-	fmt.Println(a.Key.Pair.PublicKey)
-	fmt.Println(a.Key.Pair.PrivateKey)
-	fmt.Println(a.Address)
+	fmt.Println(acc.Address.ToB58())
 }

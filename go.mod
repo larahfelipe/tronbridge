@@ -4,7 +4,13 @@ go 1.21.3
 
 require github.com/tyler-smith/go-bip39 v1.1.0
 
-require github.com/btcsuite/btcd v0.20.1-beta // indirect
+require (
+	github.com/btcsuite/btcd v0.20.1-beta // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/testify v1.9.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
 
 require (
 	github.com/btcsuite/btcutil v1.0.2
